@@ -1,0 +1,175 @@
+doctype 5
+html
+  head
+    title Jacob Wirth
+    //if lt IE 9
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    link(type='text/css', rel='stylesheet', href='/resume.css')
+    meta(name='viewport', content='width=device-width, initial-scale=1')
+    style(media='print')
+      a {
+        border: none !important;
+      }
+      h2 {
+        background: none !important;
+        color: black !important;
+        border: solid 1px black !important;
+      }
+      body {
+        width: 700px;
+        font-size: 13px;
+      }
+      body > article > section {
+        margin-left: 5px;
+      }
+
+  body
+    header
+      h1 Jacob Wirth
+
+      table
+        tr
+          th.left January 2013
+          th Portfolio:
+          th.right Contact:
+        tr
+          td.left Temporary Address: Waterloo ON
+          td: a(href='http://www.jacobwirth.ca') jacobwirth.ca
+          td.right jacob.wirth@sympatico.ca
+        tr
+          td.left Permanent Address: Ottawa ON
+          td: a(href='http://code.jacobwirth.ca/') code.jacobwirth.ca
+          td.right (226) 600-6547
+
+    article
+      h2 Technical Qualifications
+
+      section.first
+        :markdown
+          * Programming Languages
+            * Java (5 years)
+              * Thorough knowledge of libraries
+              * Low level bytecode and JVM knowledge
+              * Reverse engineering experience
+            * C, C++ (3 years), OpenGL, GLSL (1 year)
+              * Experience with 3D rendering techniques
+            * Visual Basic, C#, .NET (3 years)
+            * Flash / Actionscript (1 year)
+            * Basic experience with: Python, Ruby
+          * Web Experience
+            * Markups and Syntax:
+              * HTML, Jade
+              * CSS, LESS
+              * JSON, RegEx
+            * Client Side: Javascript, jQuery, AJAX (5 years)
+            * Server Side:
+              * PHP (4 years)
+              * Node.js (2 years)
+              * Golang (3 months)
+            * Web Servers: Apache, Nginx, IIS
+
+      section
+        :markdown
+          * Databases
+            * MySQL, MSSQL, PostgreSQL, Sqlite
+            * MongoDB
+          * Operating Systems
+            * Linux: Arch Linux, Debian, Ubuntu, CentOS
+            * Mac OS X
+            * Microsoft Windows
+            * Mobile: Android, Windows
+          * Source Control
+            * Git, Mercurial
+            * Subversion
+            * Jenkins CI
+          * Hardware Experience
+            * Desktop and server assembly
+            * Networking equipment operation and setup
+            * Sound board, lighting board, and spotlight operation
+            * Microphone, speaker, soundboard, and light setup
+            * Circuit building, soldering
+            * Operating a variety of lab equipment
+
+    article
+      h2 Work Experience
+
+      :markdown
+        ### Software Developer - Sage Data Solutions
+        * Summer 2011
+          * Tested new software features for quality assurance
+          * Developed a new piece of software for tracking security patrols  
+            (Implemented on Desktop, Handheld, and Web)
+          * Technologies Used: Visual C#, PostgreSQL, ASP.NET, HTML, CSS, Mercurial
+        * Summer 2012
+          * Reverse engineered and converted old Visual FoxPro code to Visual Basic
+          * Updated existing software to fix bugs and efficiency  
+            (Cut down 10 minute database sync to less than 30 seconds, Fixed sync and UI corner cases)
+          * Developed a web reporting utility to fit the needs of a client
+          * Set up an in-house rack server
+          * Technologies Used: Visual Basic, PostgreSQL, HTML, CSS, ASP.NET, Visual FoxPro
+
+        ### Audio Visual Technician - Ottawa Carleton District School Board
+        * 2011 - 2012
+          * Set up lighting and sound equipment for events hosted at Sir Robert Borden High School
+          * Determined sound and lighting needs by meeting with clients
+          * Operated sound board, lighting board, and spotlight for several performances  
+            (Feature Length Play, SRB Concert Band Performances, SRB Talent Show)
+
+    .page_break
+
+    article
+      h2 Relevant Projects
+      h3
+        | For more details, source code, and other projects see 
+        a(href='http://jacobwirth.ca') jacobwirth.ca
+      br
+
+      section.first
+        :markdown
+          * Wat Do - Time Management Utility (2012)
+            * Prioritizes and displays assignments in an easy to use web interface
+            * Created using Node.js, Jade, LESS, MongoDB
+          * Custom 3D Renderer (2012)
+            * Renders objects on the CPU without using any external libraries
+            * Rendering method similar to that of OpenGL
+            * Created using Java
+          * Real-Time Fractal Generator (2012)
+            * Renders an interactive Julia Set using the GPU
+            * Created using GLSL, OpenGL, and C++
+
+      section
+        :markdown
+          * TetrUs - Co-operative Multiplayer Tetris (2011)
+            * Uses peer-to-peer networking for connecting between players
+            * Created using Java and Java Sockets
+          * MyCraft - Minecraft Mod Loader (2011)
+            * Uses java bytecode manipulation to modify minecraft
+            * Created using Java, ASM Library (Previously used BCEL)
+          * UberSand - Basic Particle Physics Simulator (2010)
+            * Simulates particle densisty and surface tension
+            * Created using Java
+
+    article
+      h2 Awards and Achievements
+
+      section.light
+        :markdown
+          * Software Engineering Entrance Scholarship (University of Waterloo, 2012)
+          * 100%, Grade 12 Programming course - taken in Grade 11. (Sir Robert Borden High School, 2011)
+          * Proficiency Award in Computer Science (Sir Robert Borden High School, 2011)
+          * Honourable Mention, Canadian Computing Competition (University of Waterloo, Senior, [2011](http://cemc.uwaterloo.ca/contests/computing/2011/stage1/2011CCCStage1Results.pdf) and [2012](http://cemc.uwaterloo.ca/contests/computing/2012/stage1/2012CCCStage1Results.pdf))
+          * Completed [Stripe - Capture the Flag 2.0](https://stripe.com/blog/capture-the-flag-20) ([#709](https://stripe-ctf.com/leaderboard/35), 2012)
+          * Top 10 ranking on several Dwite.ca programming contents rounds (2010 - 2012, Team: [Pikachu Bread](http://dwite.ca/home/team/603))
+
+    article
+      h2 Education
+
+      :markdown
+        * Candidate for Bachelor of Software Engineering - Co-op Program
+          * University of Waterloo  
+            September 2012 - Present
+        * Ontario Secondary School Diploma
+          * Sir Robert Borden High School  
+            September 2008 - June 2012
+            * Ontario Scholar 2012
+            * Academic Honours 2010, 2011

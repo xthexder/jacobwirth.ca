@@ -13,5 +13,5 @@ dev:
 	supervisor -n exit -e 'less' -x make compile-assets &
 	supervisor -n error -i 'public' jacobwirth.js
 
-run: compile-assets
+run:
 	node jacobwirth.js

@@ -1,9 +1,11 @@
 LESSC = ./node_modules/less/bin/lessc
 
 prepare: compile-assets
+
+install:
 	npm install
 
-compile-assets:
+compile-assets: install
 	${LESSC} -O3 --yui-compress assets/css/master.less > public/master.css
 	${LESSC} -O3 --yui-compress assets/css/resume.less > public/resume.css
 

@@ -1,4 +1,4 @@
-LESSC = lessc
+LESSC = ./node_modules/less/bin/lessc
 
 prepare: compile-assets
 	npm install

@@ -1,0 +1,55 @@
+* {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: black;//url("background.jpg") repeat;
+}
+
+#glcanvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+#overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 10;
+
+  overflow: hidden;
+}
+
+.glshadow {
+  position: absolute;
+  background: #444444;
+  transition: all 1000ms;
+  -moz-transition: all 1000ms;
+  -webkit-transition: all 1000ms;
+  -o-transition: all 1000ms;
+}
+
+#rect1 {
+  left: 310px;
+  top: 180px;
+  width: 90px;
+  height: 20px;
+}
+
+#rect2 {
+  left: 110px;
+  top: 300px;
+  width: 290px;
+  height: 80px;
+}
+
+#rect3 {
+  left: 170px;
+  top: 100px;
+  width: 30px;
+  height: 150px;
+}

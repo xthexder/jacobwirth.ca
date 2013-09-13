@@ -42,8 +42,7 @@ window.requestAnimFrame = (function(){
 function render() {
   gl.useProgram(shaders["raytrace"]);
   gl.clear(gl.COLOR_BUFFER_BIT);
-    
-  if (mouseLight) gl.uniform2f(shaders["raytrace"].uLightUniform, mousex, gl.viewportHeight - mousey);
+
   var uniformArray = new Float32Array(50 * 4);
   var tmpcanvas = canvas.getBoundingClientRect();
   for (var i = 0; i < rects.length && i < 50; i++) {
@@ -57,6 +56,8 @@ function render() {
   gl.uniform1i(shaders["raytrace"].uRectsUniform, rects.length);
   gl.uniform1f(shaders["raytrace"].uSeedUniform, Math.random() * gl.viewportWidth * 10);
   gl.uniform1f(shaders["raytrace"].uIterationsUniform, iterations);
+
+  if (mouseLight) gl.uniform2f(shaders["raytrace"].uLightUniform, mousex, gl.viewportHeight - mousey);
   
   gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
   fps++;

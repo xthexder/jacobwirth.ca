@@ -4,15 +4,25 @@ html
     title
       block title
     //if lt IE 9
-      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+      script(src='http://html5shim.googlecode.com/svn/trunk/html5.js')
     link(type='text/css', rel='stylesheet', href='/master.css')
     meta(name='viewport', content='width=device-width, initial-scale=1')
-    script(src='/js/glMatrix-0.9.5.min.js', type='text/javascript')
-    script(src='/js/shadows.js', type='text/javascript')
+    script(src='/js/glMatrix-0.9.5.min.js')
+    script(src='/js/shadows.js')
     block head
 
-  body(lang='en', onload='loadGL()')
+  body(onload='loadGL()')
     #overlay
+      header#header
+        nav
+          ul
+            li
+              a(href='#') Stuff
+            li
+              a(href='#') Stuff2
+            li
+              a(href='#') Stuff3
       block content
+    #tint
     canvas#glcanvas(width='640', height='480')
       | Your browser doesn't appear to support the HTML5 &lt;canvas&gt; element.

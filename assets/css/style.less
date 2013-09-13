@@ -25,8 +25,57 @@ html {
   height: 100%;
 
   body {
-    background-color: black;
+    background: #092533;
     height: 100%;
+
+    #header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 50px;
+      z-index: 20;
+      overflow: hidden;
+
+      nav ul {
+        list-style: none;
+
+        li {
+          float: left;
+          margin: 10px 0;
+          border-left: 1px solid rgba(255, 255, 255, 0.5);
+
+          &:first-child {
+            border: none;
+          }
+
+          a {
+            display: inline-block;
+            height: 20px;
+            line-height: 20px;
+            padding: 5px 10px;
+            text-decoration: none;
+
+            color: rgba(255, 255, 255, 0.8);
+            text-shadow: 0px 0px 10px black;
+
+            transition: color 300ms;
+            -moz-transition: color 300ms;
+            -webkit-transition: color 300ms;
+            -o-transition: color 300ms;
+
+            &:hover {
+              color: rgba(255, 255, 120, 0.8);
+
+              transition: color 50ms;
+              -moz-transition: color 50ms;
+              -webkit-transition: color 50ms;
+              -o-transition: color 50ms;
+            }
+          }
+        }
+      }
+    }
 
     #overlay {
       position: absolute;
@@ -36,7 +85,8 @@ html {
       bottom: 0;
       z-index: 10;
 
-      overflow: hidden;
+      overflow-x: auto;
+      overflow-y: hidden;
 
       .glshadow {
         position: absolute;
@@ -74,6 +124,20 @@ html {
         width: 30px;
         height: 150px;
       }
+    }
+
+    #tint {
+      background: rgba(0, 0, 0, 0.6);
+      background: -moz-linear-gradient(top, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.4) 10%, rgba(0,0,0,0.4) 100%);
+      background: -webkit-linear-gradient(top, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.4) 10%, rgba(0,0,0,0.4) 100%);
+      background: -o-linear-gradient(top, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.4) 10%, rgba(0,0,0,0.4) 100%);
+
+      position: fixed;
+      top: 50px;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 5;
     }
     
     #glcanvas {

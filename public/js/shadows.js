@@ -86,7 +86,7 @@ function initBuffers() {
   gl.uniform1f(shaders["raytrace"].uSeedUniform, Math.random() * gl.viewportWidth * 10);
   gl.uniform1f(shaders["raytrace"].uIterationsUniform, iterations);
 
-  if (!mouseLight) gl.uniform2f(shaders["raytrace"].uLightUniform, gl.viewportWidth / 2, 0);
+  if (!mouseLight) gl.uniform2f(shaders["raytrace"].uLightUniform, gl.viewportWidth / 2, gl.viewportHeight - 50);
 }
 
 function ajaxGet(url, callback) {
@@ -174,26 +174,30 @@ function loadGL() {
   resizeCanvas();
   window.addEventListener('resize', resizeCanvas);
 
-  try {
-    gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
-    gl.viewportWidth = canvas.width;
-    gl.viewportHeight = canvas.height;
-    
-    overlay.addEventListener('mousemove', function(evt) {
-      var tmp = canvas.getBoundingClientRect();
-      mousex = evt.clientX - tmp.left;
-      mousey = evt.clientY - tmp.top;
-    });
-    overlay.addEventListener('click', function(evt) {
+  gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
+  gl.viewportWidth = canvas.width;
+  gl.viewportHeight = canvas.height;
+
+  overlay.addEventListener('mousemove', function(evt) {
+    var tmp = canvas.getBoundingClientRect();
+    mousex = evt.clientX - tmp.left;
+    mousey = evt.clientY - tmp.top;
+  });
+  overlay.addEventListener('click', function(evt) {
+    if (evt.target === overlay) {
       mouseLight = !mouseLight;
       var tmp = canvas.getBoundingClientRect();
       mousex = evt.clientX - tmp.left;
       mousey = evt.clientY - tmp.top;
       initBuffers();
-    });
-  } catch (e) {
-    console.log(e);
-  }
+    }
+  });
+  var scrollEvent = function(evt) {
+    overlay.scrollLeft -= evt.wheelDelta || (evt.detail * -40);
+  };
+  overlay.addEventListener('DOMMouseScroll', scrollEvent);
+  overlay.addEventListener('mousewheel', scrollEvent);
+
   if (!gl) {
     console.log("Could not initialize WebGL!");
   }

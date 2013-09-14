@@ -7,26 +7,10 @@ var shaders = {};
 var mouseLight = false;
 var mousex = 0;
 var mousey = 0;
-var iterations = 25;
+var iterations = 10;
 var targetfps = 30;
 
-var fps = 0;
-
-setInterval(function() {
-  rects[0].style.width = fps * 10 + "px";
-  rects[0].innerHTML = "FPS: " + fps + "<br/>Iterations: " + Math.floor(iterations);
-  //console.log(fps);
-  //console.log(iterations);
-
-
-  iterations += (fps - targetfps) * Math.log(Math.abs(fps - targetfps) + 1);
-  if (iterations < 5) {
-    iterations = 5;
-  } else if (iterations > 200) {
-    iterations = 200;
-  }
-  fps = 0;
-}, 1000);
+var lastframe = new Date().getTime();
 
 window.requestAnimFrame = (function(){
   return  window.requestAnimationFrame || 
@@ -60,7 +44,20 @@ function render() {
   if (mouseLight) gl.uniform2f(shaders["raytrace"].uLightUniform, mousex, gl.viewportHeight - mousey);
   
   gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
-  fps++;
+
+  var now = new Date().getTime();
+  var fps = 1000 / (now - lastframe);
+  lastframe = now;
+
+  rects[0].style.width = fps * 10 + "px";
+  rects[0].innerHTML = "FPS: " + Math.floor(fps) + "<br/>Iterations: " + Math.floor(iterations);
+  
+  iterations += Math.min(1, fps - targetfps);
+  if (iterations < 5) {
+    iterations = 5;
+  } else if (iterations > 200) {
+    iterations = 200;
+  }
 }
 
 function initBuffers() {

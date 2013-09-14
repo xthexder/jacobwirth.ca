@@ -27,30 +27,31 @@ vec2 intersectAABB(vec2 org, vec2 dest, vec2 dirfrac, vec4 rect) {
 
 void main(void) {
   vec2 pixel = vec2(gl_FragCoord.x, gl_FragCoord.y);
-  float col = u_iterations * 1.05;
+  float col = 0.0;
   if (length(u_light - pixel) >= spread) {
     vec2 perp = normalize(vec2(pixel.y - u_light.y, u_light.x - pixel.x));
     vec2 realdir = normalize(pixel - u_light);
     for (float j = 0.0; j < maxiterations; j++) {
       if (j >= u_iterations) break;
-      float offx = j / u_iterations * 2.0 - 1.0;
-      float offy = sqrt(1.0 - offx * offx);
-      vec2 tmplight = u_light + (perp * offx + realdir * offy) * spread;
+      float angle = j / min(maxiterations, u_iterations) * 3.14159 - 1.5708;
+      vec2 tmplight = u_light + (perp * sin(angle) + realdir * cos(angle)) * spread;
       vec2 dir = tmplight - pixel;
       float amax = length(dir);
       dir = normalize(dir);
       vec2 dirfrac = vec2(1.0 / dir.x, 1.0 / dir.y);
 
+      float diff = cos(angle) * 2.0;
       for (int i = 0; i < 50; i++) {
         if (i < u_rects) {
           vec2 tmp = intersectAABB(pixel, u_light, dirfrac, u_rect[i]);
           if (tmp.x < amax && tmp.y >= 0.0) {
-            col -= 1.0;
+            diff = 0.0;
             break;
           }
         } else break;
       }
+      col += diff;
     }
-  }
-  gl_FragColor = vec4(vec3(0.4, 0.8, 1.0), min(1.0, col / min(maxiterations, u_iterations)) * pow(0.1, length(u_light - gl_FragCoord.xy) / 1000.0) * 0.8);
+  } else col = u_iterations;
+  gl_FragColor = vec4(vec3(0.4, 0.8, 1.0), min(1.0, col / min(maxiterations, u_iterations)) * pow(0.1, length(u_light - gl_FragCoord.xy) / 1000.0));
 }

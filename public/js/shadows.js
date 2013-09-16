@@ -10,7 +10,18 @@ var mousey = 0;
 var iterations = 10;
 var targetfps = 30;
 
-var lastframe = new Date().getTime();
+var lastframe1 = new Date().getTime() - 1;
+var lastframe2 = new Date().getTime();
+var fpscounter = 0;
+
+var enabled = true;
+
+setTimeout(function() {
+  if (fpscounter < 30) {
+    enabled = false;
+    console.log("Rendering disabled");
+  }
+}, 2000);
 
 window.requestAnimFrame = (function(){
   return  window.requestAnimationFrame || 
@@ -18,8 +29,8 @@ window.requestAnimFrame = (function(){
     window.mozRequestAnimationFrame || 
     window.oRequestAnimationFrame || 
     window.msRequestAnimationFrame || 
-    function( callback ){
-      window.setTimeout(callback, 1000 / 60);
+    function(callback) {
+      window.setTimeout(callback, 1000 / targetfps);
     };
 })();
 
@@ -46,13 +57,21 @@ function render() {
   gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 
   var now = new Date().getTime();
-  var fps = 1000 / (now - lastframe);
-  lastframe = now;
+  var fps1 = 1000 / (now - lastframe2);
+  var fps2 = 1000 / (lastframe2 - lastframe1);
+  var fps = (fps1 + fps2) / 2.0;
+  lastframe1 = lastframe2;
+  lastframe2 = now;
+  fpscounter++;
 
   rects[0].style.width = fps * 10 + "px";
   rects[0].innerHTML = "FPS: " + Math.floor(fps) + "<br/>Iterations: " + Math.floor(iterations);
   
-  iterations += Math.min(1, Math.max(-5, fps - targetfps));
+  if (fps > targetfps + 2) {
+    iterations++;
+  } else if (fps < targetfps - 2) {
+    iterations += Math.max(-5, fps - targetfps + 2);
+  }
   if (iterations < 5) {
     iterations = 5;
   } else if (iterations > 100) {
@@ -230,9 +249,11 @@ function loadGL() {
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
     gl.enable(gl.BLEND);
 
-    (function animloop(){
-      requestAnimFrame(animloop);
-      render();
+    (function animloop() {
+      if (enabled) {
+        render();
+        requestAnimFrame(animloop);
+      }
     })();
   });
 }

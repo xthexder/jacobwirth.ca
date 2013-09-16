@@ -27,8 +27,8 @@ vec2 intersectAABB(vec2 org, vec2 dirfrac, vec4 rect) {
 
 void main(void) {
   vec2 pixel = vec2(gl_FragCoord.x, gl_FragCoord.y);
-  float col = 0.0;
-  float maxcol = 0.0;
+  float col = 0.0001;
+  float maxcol = 0.0001;
   if (length(u_light - pixel) >= spread) {
     vec2 perp = normalize(vec2(pixel.y - u_light.y, u_light.x - pixel.x));
     vec2 realdir = normalize(pixel - u_light);
@@ -55,9 +55,6 @@ void main(void) {
       }
       col += diff;
     }
-  } else {
-    col = 1.0;
-    maxcol = 1.0;
   }
   gl_FragColor = vec4(vec3(0.4, 0.8, 1.0), col / maxcol * pow(0.1, length(u_light - gl_FragCoord.xy) / 1000.0));
 }

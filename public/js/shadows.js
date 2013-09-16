@@ -52,7 +52,7 @@ function render() {
   rects[0].style.width = fps * 10 + "px";
   rects[0].innerHTML = "FPS: " + Math.floor(fps) + "<br/>Iterations: " + Math.floor(iterations);
   
-  iterations += Math.min(1, fps - targetfps);
+  iterations += Math.min(1, Math.max(-5, fps - targetfps));
   if (iterations < 5) {
     iterations = 5;
   } else if (iterations > 200) {

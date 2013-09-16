@@ -25,8 +25,12 @@ vec2 intersectAABB(vec2 org, vec2 dirfrac, vec4 rect) {
   }
 }
 
+float rand(vec2 co) {
+  return fract(sin(dot(co.xy, vec2(12.9898, 78.233))) * 43758.5453);
+}
+
 void main(void) {
-  vec2 pixel = vec2(gl_FragCoord.x, gl_FragCoord.y);
+  vec2 pixel = gl_FragCoord.xy;
   float col = 0.0001;
   float maxcol = 0.0001;
   if (length(u_light - pixel) >= spread) {
@@ -34,7 +38,8 @@ void main(void) {
     vec2 realdir = normalize(pixel - u_light);
     for (float j = 0.0; j < maxiterations; j++) {
       if (j >= u_iterations) break;
-      float tmpx = j / min(maxiterations, u_iterations) * 2.0 - 1.0;
+      float tmpx = j / min(maxiterations, u_iterations) * 2.0 - 1.0 + rand(pixel + u_seed);
+      if (tmpx > 1.0) tmpx -= 2.0;
       float tmpy = sqrt(1.0 - tmpx * tmpx);
       vec2 offset = perp * tmpx + realdir * tmpy;
       vec2 tmplight = u_light + offset * spread;

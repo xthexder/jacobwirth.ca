@@ -55,8 +55,8 @@ function render() {
   iterations += Math.min(1, Math.max(-5, fps - targetfps));
   if (iterations < 5) {
     iterations = 5;
-  } else if (iterations > 200) {
-    iterations = 200;
+  } else if (iterations > 100) {
+    iterations = 100;
   }
 }
 

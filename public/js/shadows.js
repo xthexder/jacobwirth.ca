@@ -1,5 +1,5 @@
 var gl = false;
-var canvas;
+var canvas, glinfo;
 var rects = [];
 
 var shaders = {};
@@ -23,12 +23,12 @@ setTimeout(function() {
   }
 }, 2000);
 
-window.requestAnimFrame = (function(){
-  return  window.requestAnimationFrame || 
-    window.webkitRequestAnimationFrame || 
-    window.mozRequestAnimationFrame || 
-    window.oRequestAnimationFrame || 
-    window.msRequestAnimationFrame || 
+window.requestAnimFrame = (function() {
+  return  window.requestAnimationFrame ||
+    window.webkitRequestAnimationFrame ||
+    window.mozRequestAnimationFrame ||
+    window.oRequestAnimationFrame ||
+    window.msRequestAnimationFrame ||
     function(callback) {
       window.setTimeout(callback, 1000 / targetfps);
     };
@@ -53,7 +53,7 @@ function render() {
   gl.uniform1f(shaders["raytrace"].uIterationsUniform, iterations);
 
   if (mouseLight) gl.uniform2f(shaders["raytrace"].uLightUniform, mousex, gl.viewportHeight - mousey);
-  
+
   gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 
   var now = new Date().getTime();
@@ -64,9 +64,8 @@ function render() {
   lastframe2 = now;
   fpscounter++;
 
-  rects[0].style.width = fps * 10 + "px";
-  rects[0].innerHTML = "FPS: " + Math.floor(fps) + "<br/>Iterations: " + Math.floor(iterations);
-  
+  glinfo.innerHTML = "FPS: " + Math.floor(fps) + "<br/>Iterations: " + Math.floor(iterations);
+
   if (fps > targetfps + 2) {
     iterations++;
   } else if (fps < targetfps - 2) {
@@ -175,6 +174,7 @@ function loadShaders(shaderList, callback) {
 function loadGL() {
   canvas = document.getElementById("glcanvas");
   var overlay = document.getElementById("overlay");
+  glinfo = document.getElementById("glinfo");
   rects = overlay.getElementsByClassName("glshadow");
 
   var resizeCanvas = function() {

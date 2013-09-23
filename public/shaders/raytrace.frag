@@ -2,9 +2,14 @@ precision mediump float;
 
 uniform vec2 u_light;
 uniform vec4 u_rect[50];
+uniform vec4 u_text[50];
+uniform vec4 u_textoffset[50];
 uniform int u_rects;
+uniform int u_texts;
 uniform float u_seed;
 uniform float u_iterations;
+
+uniform sampler2D u_renderedtext;
 
 const float spread = 20.0;
 
@@ -28,30 +33,6 @@ float rand(vec2 co) {
   return fract(sin(dot(co.xy, vec2(12.9898, 78.233))) * 43758.5453);
 }
 
-vec4 getRect(int i) {
-  if (i == 0) {
-    return u_rect[0];
-  } else if (i == 1) {
-    return u_rect[1];
-  } else if (i == 2) {
-    return u_rect[2];
-  } else if (i == 3) {
-    return u_rect[3];
-  } else if (i == 4) {
-    return u_rect[4];
-  } else if (i == 5) {
-    return u_rect[5];
-  } else if (i == 6) {
-    return u_rect[6];
-  } else if (i == 7) {
-    return u_rect[7];
-  } else if (i == 8) {
-    return u_rect[8];
-  } else {
-    return u_rect[9];
-  }
-}
-
 void main(void) {
   vec2 pixel = gl_FragCoord.xy;
   float col = 0.0001;
@@ -59,9 +40,9 @@ void main(void) {
   if (length(u_light - pixel) >= spread) {
     vec2 perp = normalize(vec2(pixel.y - u_light.y, u_light.x - pixel.x));
     vec2 realdir = normalize(pixel - u_light);
-    for (float j = 0.0; j < 500.0; j++) {
-      if (j >= u_iterations) break;
-      float tmpx = j / u_iterations * 2.0 - 1.0 + rand(pixel + u_seed);
+    for (int j = 0; j < 500; j++) {
+      if (float(j) >= u_iterations) break;
+      float tmpx = float(j) / u_iterations * 2.0 - 1.0 + rand(pixel + u_seed);
       if (tmpx > 1.0) tmpx -= 2.0;
       float tmpy = sqrt(1.0 - tmpx * tmpx);
       vec2 offset = perp * tmpx + realdir * tmpy;
@@ -75,14 +56,58 @@ void main(void) {
       maxcol += diff;
       for (int i = 0; i < 50; i++) {
         if (i >= u_rects) break;
-        vec2 tmp = intersectAABB(pixel, dirfrac, i < 10 ? getRect(i) : u_rect[i]);
+        vec2 tmp = intersectAABB(pixel, dirfrac, u_rect[i]);
         if (tmp.x < amax && tmp.y >= 0.0) {
           diff = 0.0;
           break;
         }
       }
+      for (int i = 0; i < 50; i++) {
+        if (i >= u_texts) break;
+        vec4 tmprect = u_text[i].xyxy + vec4(u_textoffset[i].xy, u_textoffset[i].xy + u_textoffset[i].zw);
+        vec2 tmp = intersectAABB(pixel, dirfrac, tmprect);
+        if (tmp.x < amax && tmp.y >= 0.0) {
+          vec2 org = (dir * max(0.0, tmp.x)) + pixel - tmprect.xy;
+          vec2 dest = (dir * min(amax, tmp.y)) + pixel - tmprect.xy;
+
+          int stepX = (dest.x > org.x) ? 1 : -1;
+          int stepY = (dest.y > org.y) ? 1 : -1;
+
+          vec2 delta = abs(dest.yx - org.yx);
+
+          float maxX = delta.x * ((stepX > 0) ? (1.0 - fract(org.x)) : fract(org.x));
+          float maxY = delta.y * ((stepY > 0) ? (1.0 - fract(org.y)) : fract(org.y));
+
+          ivec2 test = ivec2(org);
+          ivec2 endTile = ivec2(dest);
+
+          for (int k = 0; k < 1000; k++) {
+            if (test == endTile) break;
+
+            if (maxX < maxY) {
+              maxX += delta.x;
+              test.x += stepX;
+
+              vec2 tmp = (vec2(test) + vec2(0.5)) / u_textoffset[i].zw;
+              if (texture2D(u_renderedtext, tmp).w >= 0.5) {
+                diff = 0.0;
+                break;
+              }
+            } else {
+              maxY += delta.y;
+              test.y += stepY;
+
+              vec2 tmp = (vec2(test) + vec2(0.5)) / u_textoffset[i].zw;
+              if (texture2D(u_renderedtext, tmp).w >= 0.5) {
+                diff = 0.0;
+                break;
+              }
+            }
+          }
+        }
+      }
       col += diff;
     }
   }
-  gl_FragColor = vec4(vec3(0.4, 0.8, 1.0), col / maxcol * pow(0.1, length(u_light - gl_FragCoord.xy) / 1000.0));
+  gl_FragColor = vec4(vec3(0.4, 0.8, 1.0), col / maxcol * pow(0.1, length(u_light - pixel) / 1000.0));
 }

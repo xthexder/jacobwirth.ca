@@ -89,7 +89,7 @@ void main(void) {
           if (angle < 0.0) angle += 6.28318;
           vec4 tmp2 = texture2D(u_shadowlookup, (vec2(index + 0.5, angle / 6.28318 * u_angles - 0.5)) / vec2((width + height) * 2.0, u_angles)) * 256.0;
           vec2 minmax = tmp2.xz + tmp2.yw * 256.0 + vec2(tmp.x);
-          if (minmax.y >= minmax.x) {
+          if (minmax.y > minmax.x) {
             if (minmax.x < 0.0 && minmax.y >= amax) {
               // [ L P ]
               org = (dir * max(0.0, tmp.x)) + tmplight - tmprect.xy;

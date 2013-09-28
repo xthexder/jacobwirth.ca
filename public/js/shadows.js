@@ -180,54 +180,58 @@ function renderText() {
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
 
     (function doAngle() {
-      document.getElementById("debug").innerHTML = "Angle: " + angle;
       var angle2 = angle / angles * Math.PI * 2;
       var x = 0;
       var y = data.height - 1;
       var dx = Math.cos(angle2) * 100;
       var dy = Math.sin(angle2) * 100;
       var i = 0;
-      for (x = 0; x < data.width; x++, i++) { // bottom
-        var tmp = rayTrace(x, y, x + dx, y + dy, data);
-        data2[(i + angle * perimeter) * 4] = tmp[0] % 256;
-        data2[(i + angle * perimeter) * 4 + 1] = Math.floor(tmp[0] / 256);
-        data2[(i + angle * perimeter) * 4 + 2] = tmp[1] % 256;
-        data2[(i + angle * perimeter) * 4 + 3] = Math.floor(tmp[1] / 256);
-      }
-      x = data.width - 1;
-      for (y = data.height - 1; y >= 0; y--, i++) { // right
-        var tmp = rayTrace(x, y, x + dx, y + dy, data);
-        data2[(i + angle * perimeter) * 4] = tmp[0] % 256;
-        data2[(i + angle * perimeter) * 4 + 1] = Math.floor(tmp[0] / 256);
-        data2[(i + angle * perimeter) * 4 + 2] = tmp[1] % 256;
-        data2[(i + angle * perimeter) * 4 + 3] = Math.floor(tmp[1] / 256);
-      }
-      y = 0;
-      for (x = data.width - 1; x >= 0; x--, i++) { // top
-        var tmp = rayTrace(x, y, x + dx, y + dy, data);
-        data2[(i + angle * perimeter) * 4] = tmp[0] % 256;
-        data2[(i + angle * perimeter) * 4 + 1] = Math.floor(tmp[0] / 256);
-        data2[(i + angle * perimeter) * 4 + 2] = tmp[1] % 256;
-        data2[(i + angle * perimeter) * 4 + 3] = Math.floor(tmp[1] / 256);
-      }
-      x = 0;
-      for (y = 0; y < data.height; y++, i++) { // left
-        var tmp = rayTrace(x, y, x + dx, y + dy, data);
-        data2[(i + angle * perimeter) * 4] = tmp[0] % 256;
-        data2[(i + angle * perimeter) * 4 + 1] = Math.floor(tmp[0] / 256);
-        data2[(i + angle * perimeter) * 4 + 2] = tmp[1] % 256;
-        data2[(i + angle * perimeter) * 4 + 3] = Math.floor(tmp[1] / 256);
-      }
+      if (dy <= 0) {
+        for (x = 0; x < data.width; x++, i++) { // bottom
+          var tmp = rayTrace(x, y, x + dx, y + dy, data);
+          data2[(i + angle * perimeter) * 4] = tmp[0] % 256;
+          data2[(i + angle * perimeter) * 4 + 1] = Math.floor(tmp[0] / 256);
+          data2[(i + angle * perimeter) * 4 + 2] = tmp[1] % 256;
+          data2[(i + angle * perimeter) * 4 + 3] = Math.floor(tmp[1] / 256);
+        }
+      } else i += data.width;
+      if (dx <= 0) {
+        x = data.width - 1;
+        for (y = data.height - 1; y >= 0; y--, i++) { // right
+          var tmp = rayTrace(x, y, x + dx, y + dy, data);
+          data2[(i + angle * perimeter) * 4] = tmp[0] % 256;
+          data2[(i + angle * perimeter) * 4 + 1] = Math.floor(tmp[0] / 256);
+          data2[(i + angle * perimeter) * 4 + 2] = tmp[1] % 256;
+          data2[(i + angle * perimeter) * 4 + 3] = Math.floor(tmp[1] / 256);
+        }
+      } else i += data.height;
+      if (dy >= 0) {
+        y = 0;
+        for (x = data.width - 1; x >= 0; x--, i++) { // top
+          var tmp = rayTrace(x, y, x + dx, y + dy, data);
+          data2[(i + angle * perimeter) * 4] = tmp[0] % 256;
+          data2[(i + angle * perimeter) * 4 + 1] = Math.floor(tmp[0] / 256);
+          data2[(i + angle * perimeter) * 4 + 2] = tmp[1] % 256;
+          data2[(i + angle * perimeter) * 4 + 3] = Math.floor(tmp[1] / 256);
+        }
+      } else i += data.width;
+      if (dx >= 0) {
+        x = 0;
+        for (y = 0; y < data.height; y++, i++) { // left
+          var tmp = rayTrace(x, y, x + dx, y + dy, data);
+          data2[(i + angle * perimeter) * 4] = tmp[0] % 256;
+          data2[(i + angle * perimeter) * 4 + 1] = Math.floor(tmp[0] / 256);
+          data2[(i + angle * perimeter) * 4 + 2] = tmp[1] % 256;
+          data2[(i + angle * perimeter) * 4 + 3] = Math.floor(tmp[1] / 256);
+        }
+      } else i += data.height;
       angle++;
+      document.getElementById("debug").innerHTML = "Angle: " + angle;
+      gl.activeTexture(gl.TEXTURE1);
+      gl.bindTexture(gl.TEXTURE_2D, lookupTexture);
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, perimeter, angles, 0, gl.RGBA, gl.UNSIGNED_BYTE, data2);
       if (angle < angles)  {
-        gl.activeTexture(gl.TEXTURE1);
-        gl.bindTexture(gl.TEXTURE_2D, lookupTexture);
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, perimeter, angles, 0, gl.RGBA, gl.UNSIGNED_BYTE, data2);
         setTimeout(doAngle, 0);
-      } else {
-        gl.activeTexture(gl.TEXTURE1);
-        gl.bindTexture(gl.TEXTURE_2D, lookupTexture);
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, perimeter, angles, 0, gl.RGBA, gl.UNSIGNED_BYTE, data2);
       }
     })();
 

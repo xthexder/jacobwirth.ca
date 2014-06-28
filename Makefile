@@ -11,7 +11,7 @@ compile-assets: install
 
 dev:
 	supervisor -n exit -e 'less' -x make compile-assets &
-	supervisor -n error -i 'public' jacobwirth.js
+	PORT=8000 supervisor -n error -i 'public' jacobwirth.js
 
 run:
 	node jacobwirth.js

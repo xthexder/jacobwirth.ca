@@ -1,31 +1,32 @@
-var express = require('express')
-  , http = require('http')
-  , fs = require('fs')
-  , path = require('path')
-  , setupRoutes = require('./routes/').setupRoutes;
+var fs = require('fs'),
+  express = require('express'),
+  http = require('http');
 
 var app = express();
 app.configure(function() {
-  app.set('port', process.env.PORT || 8000);
   app.set('views', __dirname + '/views');
   app.set('view engine', 'jade');
 
   app.use(express.favicon());
-  app.use(express.logger('dev'));
   app.use(express.bodyParser());
   app.use(express.methodOverride());
   app.use(app.router);
 
-  app.use(express.static(path.join(__dirname, 'public')));
+  app.use(express.static(__dirname + '/public'));
 });
 
 app.configure('development', function() {
+  app.use(express.logger('dev'));
   app.use(express.errorHandler());
 });
 
-setupRoutes(app);
+require('./routes.js')(app);
 
-http.createServer(app).listen(app.get('port'), function() {
-  console.log("jacobwirth.ca server listening on port " + app.get('port'));
+var socket = '/tmp/jacobwirth-node.socket';
+if (fs.existsSync(socket)) fs.unlinkSync(socket);
+
+http.createServer(app).listen(process.env.PORT || socket, function() {
+  if (!process.env.PORT) fs.chmod(socket, '666');
+
+  console.log("jacobwirth.ca server listening on " + (process.env.PORT ? "port " + process.env.PORT : socket));
 });
-

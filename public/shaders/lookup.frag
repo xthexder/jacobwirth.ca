@@ -148,7 +148,6 @@ void main(void) {
     }
   }
   gl_FragColor = vec4(vec3(0.4, 0.8, 1.0), col / maxcol * pow(0.1, length(u_light - pixel) / 1000.0));
-  //gl_FragColor = vec4(0.0353, 0.1451, 0.2, 1.0 - (col / maxcol * pow(0.1, length(u_light - pixel) / 1000.0)));
   /*vec4 tmprect = u_text[0].xyxy + u_textoffset[0];
   float width = tmprect.z - tmprect.x;
   float height = tmprect.w - tmprect.y;

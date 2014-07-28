@@ -21,7 +21,7 @@ var enabled = true;
 
 setTimeout(function() {
   if (fpscounter < 30) {
-    //enabled = false;
+    enabled = false;
     console.log("Rendering disabled");
   } else {
     renderText();

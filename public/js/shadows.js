@@ -8,7 +8,7 @@ var shaders = {};
 var mouseLight = false;
 var mousex = 0;
 var mousey = 0;
-var iterations = 10;
+var iterations = 1;
 var spread = 20;
 var angles = 360;
 var targetfps = 30;
@@ -87,10 +87,10 @@ function render() {
   if (fps > targetfps + 2) {
     iterations++;
   } else if (fps < targetfps - 2) {
-    iterations += Math.max(-5, fps - targetfps + 2);
+    // iterations += Math.max(-5, fps - targetfps + 2);
   }
-  if (iterations < 5) {
-    iterations = 5;
+  if (iterations < 1) {
+    iterations = 1;
   } else if (iterations > 100) {
     iterations = 100;
   }

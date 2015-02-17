@@ -87,7 +87,7 @@ function render() {
   if (fps > targetfps + 2) {
     iterations++;
   } else if (fps < targetfps - 2) {
-    // iterations += Math.max(-5, fps - targetfps + 2);
+    iterations += Math.max(-5, fps - targetfps + 2);
   }
   if (iterations < 1) {
     iterations = 1;

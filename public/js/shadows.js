@@ -17,6 +17,10 @@ var lastframe1 = new Date().getTime() - 1;
 var lastframe2 = new Date().getTime();
 var fpscounter = 0;
 
+var sumError = 0;
+var lastError = 0;
+var lastTime = 0;
+
 var enabled = true;
 
 setTimeout(function() {
@@ -84,11 +88,12 @@ function render() {
 
   glinfo.innerHTML = "FPS: " + Math.floor(fps) + "<br/>Iterations: " + Math.floor(iterations);
 
-  if (fps > targetfps + 2) {
-    iterations++;
-  } else if (fps < targetfps - 2) {
-    iterations += Math.max(-5, fps - targetfps + 2);
-  }
+  var error = targetfps - fps;
+  sumError += error;
+  var dError = error - lastError;
+  lastError = error;
+
+  iterations += (1.0 * error) + (0.5 * this.sumError) + (1.0 * dError);
   if (iterations < 1) {
     iterations = 1;
   } else if (iterations > 100) {

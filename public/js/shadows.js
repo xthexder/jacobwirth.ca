@@ -80,7 +80,7 @@ function render() {
   //if (fpscounter % 60 == 0) renderText();
   if (fpscounter % 5 == 0) {
     var now = new Date().getTime();
-    var fps = (now - lastframe) / 5.0;
+    var fps = 5000.0 / (now - lastframe);
     lastframe = now;
 
     glinfo.innerHTML = "FPS: " + Math.floor(fps) + "<br/>Iterations: " + Math.floor(iterations);

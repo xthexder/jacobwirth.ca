@@ -23,7 +23,7 @@ var lastTime = 0;
 var enabled = true;
 
 setTimeout(function() {
-  if (fpscounter < 30) {
+  if (fpscounter < 5) {
     enabled = false;
     console.log("Rendering disabled");
   } else {

@@ -13,8 +13,7 @@ var spread = 20;
 var angles = 360;
 var targetfps = 30;
 
-var lastframe1 = new Date().getTime() - 1;
-var lastframe2 = new Date().getTime();
+var lastframe = new Date().getTime();
 var fpscounter = 0;
 
 var sumError = 0;
@@ -77,27 +76,26 @@ function render() {
 
   gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 
-  var now = new Date().getTime();
-  var fps1 = 1000 / (now - lastframe2);
-  var fps2 = 1000 / (lastframe2 - lastframe1);
-  var fps = (fps1 + fps2) / 2.0;
-  lastframe1 = lastframe2;
-  lastframe2 = now;
-  //if (fpscounter % 60 == 0) renderText();
   fpscounter++;
+  //if (fpscounter % 60 == 0) renderText();
+  if (fpscounter % 5 == 0) {
+    var now = new Date().getTime();
+    var fps = (now - lastframe) / 5.0;
+    lastframe = now;
 
-  glinfo.innerHTML = "FPS: " + Math.floor(fps) + "<br/>Iterations: " + Math.floor(iterations);
+    glinfo.innerHTML = "FPS: " + Math.floor(fps) + "<br/>Iterations: " + Math.floor(iterations);
 
-  var error = targetfps - fps;
-  sumError += error;
-  var dError = error - lastError;
-  lastError = error;
+    var error = targetfps - fps;
+    sumError += error;
+    var dError = error - lastError;
+    lastError = error;
 
-  iterations -= (0.001 * error) + (0 * this.sumError) + (0 * dError);
-  if (iterations < 1) {
-    iterations = 1;
-  } else if (iterations > 100) {
-    iterations = 100;
+    iterations -= (0.001 * error) + (0 * this.sumError) + (0 * dError);
+    if (iterations < 1) {
+      iterations = 1;
+    } else if (iterations > 100) {
+      iterations = 100;
+    }
   }
 }
 
@@ -173,7 +171,6 @@ function renderText() {
     var perimeter = (data.width + data.height) * 2;
     var data2 = new Uint8Array(perimeter * angles * 4);
 
-    var angle = 0;
     var lookupTexture = gl.createTexture();
     gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
 
@@ -184,7 +181,7 @@ function renderText() {
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
 
-    (function doAngle() {
+    for (var angle = 0; angle < angles; angle++) {
       var angle2 = angle / angles * Math.PI * 2;
       var x = 0;
       var y = data.height - 1;
@@ -231,14 +228,11 @@ function renderText() {
         }
       } else i += data.height;
       angle++;
-      document.getElementById("debug").innerHTML = "Angle: " + angle;
+      document.getElementById("debug").innerHTML = "Loading: " + (angle / 3.6);
       gl.activeTexture(gl.TEXTURE1);
       gl.bindTexture(gl.TEXTURE_2D, lookupTexture);
       gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, perimeter, angles, 0, gl.RGBA, gl.UNSIGNED_BYTE, data2);
-      if (angle < angles)  {
-        setTimeout(doAngle, 0);
-      }
-    })();
+    }
 
     var textTexture = gl.createTexture();
     gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);

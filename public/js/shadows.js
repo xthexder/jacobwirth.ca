@@ -168,6 +168,7 @@ function renderText() {
     uniformArray[i * 4 + 3] = ctx.canvas.height - miny;
     data = ctx.getImageData(minx, miny, maxx - minx + 1, maxy - miny + 1);
 
+    var angle = 0;
     var perimeter = (data.width + data.height) * 2;
     var data2 = new Uint8Array(perimeter * angles * 4);
 
@@ -181,7 +182,7 @@ function renderText() {
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
 
-    for (var angle = 0; angle < angles; angle++) {
+    (function doAngle() {
       var angle2 = angle / angles * Math.PI * 2;
       var x = 0;
       var y = data.height - 1;
@@ -228,11 +229,14 @@ function renderText() {
         }
       } else i += data.height;
       angle++;
-      document.getElementById("debug").innerHTML = "Loading: " + (angle / 3.6);
+      document.getElementById("debug").innerHTML = "Angle: " + angle;
       gl.activeTexture(gl.TEXTURE1);
       gl.bindTexture(gl.TEXTURE_2D, lookupTexture);
       gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, perimeter, angles, 0, gl.RGBA, gl.UNSIGNED_BYTE, data2);
-    }
+      if (angle < angles)  {
+        setTimeout(doAngle, 0);
+      }
+    })();
 
     var textTexture = gl.createTexture();
     gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);

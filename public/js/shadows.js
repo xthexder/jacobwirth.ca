@@ -90,7 +90,7 @@ function render() {
     var dError = error - lastError;
     lastError = error;
 
-    iterations -= (0.001 * error) + (0 * this.sumError) + (0 * dError);
+    iterations -= (0.08 * error) + (0.05 * this.sumError) + (0.05 * dError);
     if (iterations < 1) {
       iterations = 1;
     } else if (iterations > 100) {

@@ -11,6 +11,7 @@ var mousey = 0;
 var iterations = 1;
 var spread = 20;
 var angles = 360;
+var maxTexts = 8;
 var targetfps = 30;
 
 var lastframe = new Date().getTime();
@@ -56,8 +57,8 @@ function render() {
     uniformArray[i * 4 + 3] = gl.viewportHeight - tmp.top + tmpcanvas.top;
   }
   gl.uniform4fv(shaders["raytrace"].uRectUniform, uniformArray);
-  uniformArray = new Float32Array(50 * 4);
-  for (var i = 0; i < texts.length && i < 50; i++) {
+  uniformArray = new Float32Array(maxTexts * 4);
+  for (var i = 0; i < texts.length && i < maxTexts; i++) {
     var tmp = texts[i].getBoundingClientRect();
     uniformArray[i * 4] = tmp.left - tmpcanvas.left;
     uniformArray[i * 4 + 1] = gl.viewportHeight - tmp.bottom + tmpcanvas.top;
@@ -67,7 +68,6 @@ function render() {
   gl.uniform4fv(shaders["raytrace"].uTextUniform, uniformArray);
   gl.uniform1i(shaders["raytrace"].uRectsUniform, rects.length);
   gl.uniform1i(shaders["raytrace"].uTextsUniform, texts.length);
-  gl.uniform1f(shaders["raytrace"].uAnglesUniform, angles);
   gl.uniform1f(shaders["raytrace"].uSeedUniform, Math.random() * gl.viewportWidth * 10);
   gl.uniform1f(shaders["raytrace"].uSpreadUniform, spread);
   gl.uniform1f(shaders["raytrace"].uIterationsUniform, iterations);
@@ -99,44 +99,11 @@ function render() {
   }
 }
 
-function rayTrace(x1, y1, x2, y2, data) {
-  var stepX = (x2 > x1) ? 1 : -1;
-  var stepY = (y2 > y1) ? 1 : -1;
-
-  var deltaX = Math.abs(y2 - y1);
-  var deltaY = Math.abs(x2 - x1);
-
-  var maxX = (stepX > 0) ? deltaX : 0;
-  var maxY = (stepY > 0) ? deltaY : 0;
-
-  var testX = x1;
-  var testY = y1;
-
-  var min = 1000000;
-  var max = 0;
-
-  while (testX >= 0 && testX < data.width && testY >= 0 && testY < data.height) {
-    if (data.data[(testX + testY * data.width) * 4 + 3] != 0) {
-      var dist = (testX - x1) * (testX - x1) + (testY - y1) * (testY - y1);
-      min = Math.min(min, dist);
-      max = Math.max(max, dist);
-    }
-
-    if (maxX < maxY) {
-      maxX += deltaX;
-      testX += stepX;
-    } else {
-      maxY += deltaY;
-      testY += stepY;
-    }
-  }
-
-  return [Math.sqrt(min), Math.sqrt(max)];
-}
-
 function renderText() {
-  var uniformArray = new Float32Array(50 * 4);
-  for (var i = 0; i < texts.length && i < 50; i++) {
+  var uniformArray = new Float32Array(maxTexts * 4);
+  var textTextures = new Int32Array(maxTexts);
+  var lookupTextures = new Int32Array(maxTexts);
+  for (var i = 0; i < texts.length && i < maxTexts; i++) {
     var ctx = texts[i].getContext('2d');
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
@@ -168,92 +135,48 @@ function renderText() {
     uniformArray[i * 4 + 3] = ctx.canvas.height - miny;
     data = ctx.getImageData(minx, miny, maxx - minx + 1, maxy - miny + 1);
 
-    var angle = 0;
-    var perimeter = (data.width + data.height) * 2;
-    var data2 = new Uint8Array(perimeter * angles * 4);
-
-    var lookupTexture = gl.createTexture();
-    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
-
-    gl.activeTexture(gl.TEXTURE1);
-    gl.bindTexture(gl.TEXTURE_2D, lookupTexture);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-
-    (function doAngle() {
-      var angle2 = angle / angles * Math.PI * 2;
-      var x = 0;
-      var y = data.height - 1;
-      var dx = Math.cos(angle2) * 100;
-      var dy = Math.sin(angle2) * 100;
-      var i = 0;
-      if (dy <= 0) {
-        for (x = 0; x < data.width; x++, i++) { // bottom
-          var tmp = rayTrace(x, y, x + dx, y + dy, data);
-          data2[(i + angle * perimeter) * 4] = tmp[0] % 256;
-          data2[(i + angle * perimeter) * 4 + 1] = Math.floor(tmp[0] / 256);
-          data2[(i + angle * perimeter) * 4 + 2] = tmp[1] % 256;
-          data2[(i + angle * perimeter) * 4 + 3] = Math.floor(tmp[1] / 256);
-        }
-      } else i += data.width;
-      if (dx <= 0) {
-        x = data.width - 1;
-        for (y = data.height - 1; y >= 0; y--, i++) { // right
-          var tmp = rayTrace(x, y, x + dx, y + dy, data);
-          data2[(i + angle * perimeter) * 4] = tmp[0] % 256;
-          data2[(i + angle * perimeter) * 4 + 1] = Math.floor(tmp[0] / 256);
-          data2[(i + angle * perimeter) * 4 + 2] = tmp[1] % 256;
-          data2[(i + angle * perimeter) * 4 + 3] = Math.floor(tmp[1] / 256);
-        }
-      } else i += data.height;
-      if (dy >= 0) {
-        y = 0;
-        for (x = data.width - 1; x >= 0; x--, i++) { // top
-          var tmp = rayTrace(x, y, x + dx, y + dy, data);
-          data2[(i + angle * perimeter) * 4] = tmp[0] % 256;
-          data2[(i + angle * perimeter) * 4 + 1] = Math.floor(tmp[0] / 256);
-          data2[(i + angle * perimeter) * 4 + 2] = tmp[1] % 256;
-          data2[(i + angle * perimeter) * 4 + 3] = Math.floor(tmp[1] / 256);
-        }
-      } else i += data.width;
-      if (dx >= 0) {
-        x = 0;
-        for (y = 0; y < data.height; y++, i++) { // left
-          var tmp = rayTrace(x, y, x + dx, y + dy, data);
-          data2[(i + angle * perimeter) * 4] = tmp[0] % 256;
-          data2[(i + angle * perimeter) * 4 + 1] = Math.floor(tmp[0] / 256);
-          data2[(i + angle * perimeter) * 4 + 2] = tmp[1] % 256;
-          data2[(i + angle * perimeter) * 4 + 3] = Math.floor(tmp[1] / 256);
-        }
-      } else i += data.height;
-      angle++;
-      document.getElementById("debug").innerHTML = "Angle: " + angle;
-      gl.activeTexture(gl.TEXTURE1);
-      gl.bindTexture(gl.TEXTURE_2D, lookupTexture);
-      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, perimeter, angles, 0, gl.RGBA, gl.UNSIGNED_BYTE, data2);
-      if (angle < angles)  {
-        setTimeout(doAngle, 0);
-      }
-    })();
-
     var textTexture = gl.createTexture();
+    textTextures[i] = i * 2;
     gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
 
-    gl.activeTexture(gl.TEXTURE0);
+    gl.activeTexture(gl.TEXTURE0 + i * 2);
     gl.bindTexture(gl.TEXTURE_2D, textTexture);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, data);
+
+    var frameBuffer = gl.createFramebuffer();
+    gl.bindFramebuffer(gl.FRAMEBUFFER, frameBuffer);
+    frameBuffer.width = (data.width + data.height) * 2;
+    frameBuffer.height = angles;
+
+    gl.useProgram(shaders["lookup"]);
+    gl.uniform1f(shaders["lookup"].uWidthUniform, data.width);
+    gl.uniform1f(shaders["lookup"].uHeightUniform, data.height);
+
+    var lookupTexture = gl.createTexture();
+    gl.activeTexture(gl.TEXTURE0 + i * 2 + 1);
+    lookupTextures[i] = i * 2 + 1;
+    gl.bindTexture(gl.TEXTURE_2D, lookupTexture);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, frameBuffer.width, frameBuffer.height, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+    gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, lookupTexture, 0);
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
   }
+  gl.useProgram(shaders["raytrace"]);
   gl.uniform4fv(shaders["raytrace"].uTextOffsetUniform, uniformArray);
+  gl.uniform1iv(shaders["raytrace"].uRenderedTextUniform, textTextures);
+  gl.uniform1iv(shaders["raytrace"].uShadowLookupUniform, lookupTextures);
 }
 
 function initBuffers() {
-  if (!gl || !shaders["raytrace"]) return;
+  if (!gl || !shaders["raytrace"] || !shaders["lookup"]) return;
 
   var vertexPositionBuffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, vertexPositionBuffer);
@@ -268,8 +191,14 @@ function initBuffers() {
   var pMatrix = mat4.ortho(0, gl.viewportWidth, gl.viewportHeight, 0, 0.001, 100000);
   gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
 
+  gl.useProgram(shaders["lookup"]);
   gl.bindBuffer(gl.ARRAY_BUFFER, vertexPositionBuffer);
+  gl.uniformMatrix4fv(shaders["lookup"].pMatrixUniform, false, pMatrix);
+  gl.vertexAttribPointer(shaders["lookup"].vertexPositionAttribute, 2, gl.FLOAT, false, 0, 0);
+  gl.uniform1i(shaders["lookup"].uRenderedTextUniform, 0);
+
   gl.useProgram(shaders["raytrace"]);
+  gl.bindBuffer(gl.ARRAY_BUFFER, vertexPositionBuffer);
   gl.uniformMatrix4fv(shaders["raytrace"].pMatrixUniform, false, pMatrix);
   gl.vertexAttribPointer(shaders["raytrace"].vertexPositionAttribute, 2, gl.FLOAT, false, 0, 0);
   gl.uniform1i(shaders["raytrace"].uRenderedTextUniform, 0);
@@ -396,9 +325,14 @@ function loadGL() {
     console.log("Could not initialize WebGL!");
   }
 
-  var shaderList = {"vertex": {url: "shaders/vertex.vert"}, "raytrace": {url: "shaders/raytrace.frag"}};
+  var shaderList = {"vertex": {url: "shaders/vertex.vert"}, "raytrace": {url: "shaders/raytrace.frag"}, "lookup": {url: "shaders/lookup.frag"}};
 
   loadShaders(shaderList, function() {
+    shaders["lookup"] = gl.createProgram();
+    gl.attachShader(shaders["lookup"], shaderList["vertex"].shader);
+    gl.attachShader(shaders["lookup"], shaderList["lookup"].shader);
+    gl.linkProgram(shaders["lookup"]);
+
     shaders["raytrace"] = gl.createProgram();
     gl.attachShader(shaders["raytrace"], shaderList["vertex"].shader);
     gl.attachShader(shaders["raytrace"], shaderList["raytrace"].shader);
@@ -407,6 +341,7 @@ function loadGL() {
     for (var name in shaders) {
       if (!gl.getProgramParameter(shaders[name], gl.LINK_STATUS)) {
         console.log("Could not initialize shader: " + name);
+        console.log(gl.getProgramInfoLog(shaders[name]));
         return;
       }
     }
@@ -419,7 +354,6 @@ function loadGL() {
     shaders["raytrace"].uTextUniform = gl.getUniformLocation(shaders["raytrace"], "u_text");
     shaders["raytrace"].uTextOffsetUniform = gl.getUniformLocation(shaders["raytrace"], "u_textoffset");
     shaders["raytrace"].uTextsUniform = gl.getUniformLocation(shaders["raytrace"], "u_texts");
-    shaders["raytrace"].uAnglesUniform = gl.getUniformLocation(shaders["raytrace"], "u_angles");
     shaders["raytrace"].uSeedUniform = gl.getUniformLocation(shaders["raytrace"], "u_seed");
     shaders["raytrace"].uSpreadUniform = gl.getUniformLocation(shaders["raytrace"], "u_spread");
     shaders["raytrace"].uIterationsUniform = gl.getUniformLocation(shaders["raytrace"], "u_iterations");
@@ -427,6 +361,14 @@ function loadGL() {
     shaders["raytrace"].uShadowLookupUniform = gl.getUniformLocation(shaders["raytrace"], "u_shadowlookup");
 
     gl.enableVertexAttribArray(shaders["raytrace"].vertexPositionAttribute);
+
+    shaders["lookup"].vertexPositionAttribute = gl.getAttribLocation(shaders["lookup"], "aVertexPosition");
+    shaders["lookup"].pMatrixUniform = gl.getUniformLocation(shaders["lookup"], "uPMatrix");
+    shaders["lookup"].uRenderedTextUniform = gl.getUniformLocation(shaders["lookup"], "u_renderedtext");
+    shaders["lookup"].uWidthUniform = gl.getUniformLocation(shaders["lookup"], "u_width");
+    shaders["lookup"].uHeightUniform = gl.getUniformLocation(shaders["lookup"], "u_height");
+
+    gl.enableVertexAttribArray(shaders["lookup"].vertexPositionAttribute);
 
     initBuffers();
 

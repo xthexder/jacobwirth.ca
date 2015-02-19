@@ -68,14 +68,14 @@ void main(void) {
     }
   } else if (index < u_width * 2 + u_height) { // Top
     if (dirfrac.y <= 0.0) {
-      vec2 tmp = rayTrace(vec2(u_width * 2 + u_height - index, u_height - 1), dirfrac);
+      vec2 tmp = rayTrace(vec2(u_width * 2 + u_height - index - 1, u_height - 1), dirfrac);
       gl_FragColor = packVec2(tmp);
     } else {
       gl_FragColor = vec4(0.0);
     }
   } else { // Left
     if (dirfrac.x >= 0.0) {
-      vec2 tmp = rayTrace(vec2(0.0, (u_width + u_height) * 2 - index), dirfrac);
+      vec2 tmp = rayTrace(vec2(0.0, (u_width + u_height) * 2 - index - 1), dirfrac);
       gl_FragColor = packVec2(tmp);
     } else {
       gl_FragColor = vec4(0.0);

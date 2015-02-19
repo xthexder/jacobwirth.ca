@@ -12,7 +12,7 @@ var mousey = 0;
 var iterations = 1;
 var spread = 20;
 var angles = 360;
-var maxTexts = 8;
+var maxTexts = 15;
 var targetfps = 30;
 
 var lastframe = new Date().getTime();
@@ -132,11 +132,11 @@ function renderText() {
         }
       }
     }
-    uniformArray[i * 4] = minx;
-    uniformArray[i * 4 + 1] = ctx.canvas.height - maxy - 1;
-    uniformArray[i * 4 + 2] = maxx + 1;
-    uniformArray[i * 4 + 3] = ctx.canvas.height - miny;
-    data = ctx.getImageData(minx, miny, maxx - minx + 1, maxy - miny + 1);
+    uniformArray[i * 4] = minx - 1;
+    uniformArray[i * 4 + 1] = ctx.canvas.height - maxy - 2;
+    uniformArray[i * 4 + 2] = maxx + 2;
+    uniformArray[i * 4 + 3] = ctx.canvas.height - miny + 1;
+    data = ctx.getImageData(minx - 1, miny - 1, maxx - minx + 2, maxy - miny + 2);
 
     texts[i].renderedTexture = gl.createTexture();
     gl.activeTexture(gl.TEXTURE0);

@@ -16,10 +16,10 @@ vec2 rayTrace(vec2 org, vec2 dirfrac) {
   float maxY = stepY > 0 ? delta.y : 0.0;
   ivec2 test = ivec2(org);
 
-  float mind = 1000000.0;
+  float mind = 10000.0;
   float maxd = 0.0;
 
-  for (int i = 0; i < 100000; i++) {
+  for (int i = 0; i < 10000; i++) {
     if (test.x < 0 || test.x >= u_width || test.y < 0 || test.y >= u_height) break;
     vec4 tmp = texture2D(u_renderedtext, (vec2(test) + vec2(0.5)) / vec2(u_width, u_height));
     if (tmp.w >= 0.5) {

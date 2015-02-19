@@ -5,6 +5,7 @@ var texts = [];
 var lastHovered = false;
 
 var shaders = {};
+var reinitRequired = true;
 
 var mouseLight = false;
 var mousex = 0;
@@ -24,13 +25,6 @@ var lastTime = 0;
 
 var enabled = false;
 
-setTimeout(function() {
-  if (fpscounter < 5) {
-    enabled = false;
-    console.log("Rendering disabled");
-  }
-}, 2000);
-
 window.requestAnimFrame = (function() {
   return  window.requestAnimationFrame ||
     window.webkitRequestAnimationFrame ||
@@ -43,6 +37,8 @@ window.requestAnimFrame = (function() {
 })();
 
 function render() {
+  if (reinitRequired) initBuffers();
+
   gl.useProgram(shaders["raytrace"]);
   gl.clear(gl.COLOR_BUFFER_BIT);
 
@@ -211,6 +207,7 @@ function initBuffers() {
   gl.uniform1f(shaders["raytrace"].uIterationsUniform, iterations);
 
   if (!mouseLight) gl.uniform2f(shaders["raytrace"].uLightUniform, gl.viewportWidth / 2, gl.viewportHeight - 50);
+  reinitRequired = false;
 }
 
 function ajaxGet(url, callback) {
@@ -294,12 +291,7 @@ function loadGL() {
   rects = overlay.getElementsByClassName("glshadow");
   texts = overlay.getElementsByClassName("glshadowtext");
 
-  var startLink = document.getElementById("start")
-  startLink.addEventListener('click', function(evt) {
-    enabled = !enabled;
-    if (enabled) setTimeout(animloop, 0);
-    evt.preventDefault();
-  });
+  var startLink = document.getElementById("start");
 
   var resizeCanvas = function() {
     canvas.width = window.innerWidth;
@@ -308,7 +300,7 @@ function loadGL() {
       gl.viewportWidth = canvas.width;
       gl.viewportHeight = canvas.height;
 
-      initBuffers();
+      reinitRequired = true;
     }
   };
   resizeCanvas();
@@ -332,7 +324,7 @@ function loadGL() {
       var tmp = canvas.getBoundingClientRect();
       mousex = evt.clientX - tmp.left;
       mousey = evt.clientY - tmp.top;
-      initBuffers();
+      reinitRequired = true;
     }
   });
   var scrollEvent = function(evt) {
@@ -348,55 +340,62 @@ function loadGL() {
 
   var shaderList = {"vertex": {url: "shaders/vertex.vert"}, "raytrace": {url: "shaders/raytrace.frag"}, "lookup": {url: "shaders/lookup.frag"}};
 
-  loadShaders(shaderList, function() {
-    shaders["lookup"] = gl.createProgram();
-    gl.attachShader(shaders["lookup"], shaderList["vertex"].shader);
-    gl.attachShader(shaders["lookup"], shaderList["lookup"].shader);
-    gl.linkProgram(shaders["lookup"]);
+  setTimeout(function() {
+    console.log("Loading Shaders");
+    loadShaders(shaderList, function() {
+      console.log("Compiling Shaders");
+      shaders["lookup"] = gl.createProgram();
+      gl.attachShader(shaders["lookup"], shaderList["vertex"].shader);
+      gl.attachShader(shaders["lookup"], shaderList["lookup"].shader);
+      gl.linkProgram(shaders["lookup"]);
 
-    shaders["raytrace"] = gl.createProgram();
-    gl.attachShader(shaders["raytrace"], shaderList["vertex"].shader);
-    gl.attachShader(shaders["raytrace"], shaderList["raytrace"].shader);
-    gl.linkProgram(shaders["raytrace"]);
+      shaders["raytrace"] = gl.createProgram();
+      gl.attachShader(shaders["raytrace"], shaderList["vertex"].shader);
+      gl.attachShader(shaders["raytrace"], shaderList["raytrace"].shader);
+      gl.linkProgram(shaders["raytrace"]);
 
-    for (var name in shaders) {
-      if (!gl.getProgramParameter(shaders[name], gl.LINK_STATUS)) {
-        console.log("Could not initialize shader: " + name);
-        console.log(gl.getProgramInfoLog(shaders[name]));
-        return;
+      for (var name in shaders) {
+        if (!gl.getProgramParameter(shaders[name], gl.LINK_STATUS)) {
+          console.log("Could not initialize shader: " + name);
+          console.log(gl.getProgramInfoLog(shaders[name]));
+          return;
+        }
       }
-    }
 
-    shaders["raytrace"].vertexPositionAttribute = gl.getAttribLocation(shaders["raytrace"], "aVertexPosition");
-    shaders["raytrace"].pMatrixUniform = gl.getUniformLocation(shaders["raytrace"], "uPMatrix");
-    shaders["raytrace"].uLightUniform = gl.getUniformLocation(shaders["raytrace"], "u_light");
-    shaders["raytrace"].uRectUniform = gl.getUniformLocation(shaders["raytrace"], "u_rect");
-    shaders["raytrace"].uRectsUniform = gl.getUniformLocation(shaders["raytrace"], "u_rects");
-    shaders["raytrace"].uTextUniform = gl.getUniformLocation(shaders["raytrace"], "u_text");
-    shaders["raytrace"].uTextOffsetUniform = gl.getUniformLocation(shaders["raytrace"], "u_textoffset");
-    shaders["raytrace"].uTextsUniform = gl.getUniformLocation(shaders["raytrace"], "u_texts");
-    shaders["raytrace"].uSeedUniform = gl.getUniformLocation(shaders["raytrace"], "u_seed");
-    shaders["raytrace"].uSpreadUniform = gl.getUniformLocation(shaders["raytrace"], "u_spread");
-    shaders["raytrace"].uIterationsUniform = gl.getUniformLocation(shaders["raytrace"], "u_iterations");
-    shaders["raytrace"].uRenderedTextUniform = gl.getUniformLocation(shaders["raytrace"], "u_renderedtext");
-    shaders["raytrace"].uShadowLookupUniform = gl.getUniformLocation(shaders["raytrace"], "u_shadowlookup");
+      shaders["raytrace"].vertexPositionAttribute = gl.getAttribLocation(shaders["raytrace"], "aVertexPosition");
+      shaders["raytrace"].pMatrixUniform = gl.getUniformLocation(shaders["raytrace"], "uPMatrix");
+      shaders["raytrace"].uLightUniform = gl.getUniformLocation(shaders["raytrace"], "u_light");
+      shaders["raytrace"].uRectUniform = gl.getUniformLocation(shaders["raytrace"], "u_rect");
+      shaders["raytrace"].uRectsUniform = gl.getUniformLocation(shaders["raytrace"], "u_rects");
+      shaders["raytrace"].uTextUniform = gl.getUniformLocation(shaders["raytrace"], "u_text");
+      shaders["raytrace"].uTextOffsetUniform = gl.getUniformLocation(shaders["raytrace"], "u_textoffset");
+      shaders["raytrace"].uTextsUniform = gl.getUniformLocation(shaders["raytrace"], "u_texts");
+      shaders["raytrace"].uSeedUniform = gl.getUniformLocation(shaders["raytrace"], "u_seed");
+      shaders["raytrace"].uSpreadUniform = gl.getUniformLocation(shaders["raytrace"], "u_spread");
+      shaders["raytrace"].uIterationsUniform = gl.getUniformLocation(shaders["raytrace"], "u_iterations");
+      shaders["raytrace"].uRenderedTextUniform = gl.getUniformLocation(shaders["raytrace"], "u_renderedtext");
+      shaders["raytrace"].uShadowLookupUniform = gl.getUniformLocation(shaders["raytrace"], "u_shadowlookup");
 
-    gl.enableVertexAttribArray(shaders["raytrace"].vertexPositionAttribute);
+      gl.enableVertexAttribArray(shaders["raytrace"].vertexPositionAttribute);
 
-    shaders["lookup"].vertexPositionAttribute = gl.getAttribLocation(shaders["lookup"], "aVertexPosition");
-    shaders["lookup"].pMatrixUniform = gl.getUniformLocation(shaders["lookup"], "uPMatrix");
-    shaders["lookup"].uRenderedTextUniform = gl.getUniformLocation(shaders["lookup"], "u_renderedtext");
-    shaders["lookup"].uWidthUniform = gl.getUniformLocation(shaders["lookup"], "u_width");
-    shaders["lookup"].uHeightUniform = gl.getUniformLocation(shaders["lookup"], "u_height");
+      shaders["lookup"].vertexPositionAttribute = gl.getAttribLocation(shaders["lookup"], "aVertexPosition");
+      shaders["lookup"].pMatrixUniform = gl.getUniformLocation(shaders["lookup"], "uPMatrix");
+      shaders["lookup"].uRenderedTextUniform = gl.getUniformLocation(shaders["lookup"], "u_renderedtext");
+      shaders["lookup"].uWidthUniform = gl.getUniformLocation(shaders["lookup"], "u_width");
+      shaders["lookup"].uHeightUniform = gl.getUniformLocation(shaders["lookup"], "u_height");
 
-    gl.enableVertexAttribArray(shaders["lookup"].vertexPositionAttribute);
+      gl.enableVertexAttribArray(shaders["lookup"].vertexPositionAttribute);
 
-    initBuffers();
+      gl.clearColor(0.0, 0.0, 0.0, 0.0);
+      gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+      gl.enable(gl.BLEND);
 
-    gl.clearColor(0.0, 0.0, 0.0, 0.0);
-    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-    gl.enable(gl.BLEND);
-
-    animloop();
-  });
+      console.log("Rendering Ready");
+      startLink.addEventListener('click', function(evt) {
+        enabled = !enabled;
+        if (enabled) setTimeout(animloop, 0);
+        evt.preventDefault();
+      });
+    });
+  }, 0);
 }

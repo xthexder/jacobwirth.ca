@@ -152,6 +152,7 @@ function renderText() {
     gl.bindFramebuffer(gl.FRAMEBUFFER, frameBuffer);
     frameBuffer.width = (data.width + data.height) * 2;
     frameBuffer.height = angles;
+    gl.viewport(0, 0, frameBuffer.width, frameBuffer.height);
 
     gl.useProgram(shaders["lookup"]);
     gl.uniform1i(shaders["lookup"].uWidthUniform, data.width);
@@ -171,6 +172,7 @@ function renderText() {
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
   }
   gl.enable(gl.BLEND);
+  gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
   gl.useProgram(shaders["raytrace"]);
   gl.uniform4fv(shaders["raytrace"].uTextOffsetUniform, uniformArray);
   gl.uniform1iv(shaders["raytrace"].uShadowLookupUniform, lookupTextures);

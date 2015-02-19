@@ -2,6 +2,7 @@ var gl = false;
 var canvas, glinfo;
 var rects = [];
 var texts = [];
+var lastHovered = false;
 
 var shaders = {};
 
@@ -27,8 +28,6 @@ setTimeout(function() {
   if (fpscounter < 5) {
     enabled = false;
     console.log("Rendering disabled");
-  } else {
-    renderText();
   }
 }, 2000);
 
@@ -65,6 +64,10 @@ function render() {
     uniformArray[i * 4 + 2] = tmp.right - tmpcanvas.left;
     uniformArray[i * 4 + 3] = gl.viewportHeight - tmp.top + tmpcanvas.top;
   }
+  if (lastHovered) {
+    gl.activeTexture(gl.TEXTURE0);
+    gl.bindTexture(gl.TEXTURE_2D, lastHovered.renderedTexture);
+  }
   gl.uniform4fv(shaders["raytrace"].uTextUniform, uniformArray);
   gl.uniform1i(shaders["raytrace"].uRectsUniform, rects.length);
   gl.uniform1i(shaders["raytrace"].uTextsUniform, texts.length);
@@ -76,8 +79,8 @@ function render() {
 
   gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 
+  if (fpscounter % 60 == 0) renderText();
   fpscounter++;
-  //if (fpscounter % 60 == 0) renderText();
   if (fpscounter % 5 == 0) {
     var now = new Date().getTime();
     var fps = 5000.0 / (now - lastframe);
@@ -101,8 +104,8 @@ function render() {
 
 function renderText() {
   var uniformArray = new Float32Array(maxTexts * 4);
-  var textTextures = new Int32Array(maxTexts);
   var lookupTextures = new Int32Array(maxTexts);
+  gl.disable(gl.BLEND);
   for (var i = 0; i < texts.length && i < maxTexts; i++) {
     var ctx = texts[i].getContext('2d');
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
@@ -135,12 +138,10 @@ function renderText() {
     uniformArray[i * 4 + 3] = ctx.canvas.height - miny;
     data = ctx.getImageData(minx, miny, maxx - minx + 1, maxy - miny + 1);
 
-    var textTexture = gl.createTexture();
-    textTextures[i] = i * 2;
+    texts[i].renderedTexture = gl.createTexture();
+    gl.activeTexture(gl.TEXTURE0);
     gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
-
-    gl.activeTexture(gl.TEXTURE0 + i * 2);
-    gl.bindTexture(gl.TEXTURE_2D, textTexture);
+    gl.bindTexture(gl.TEXTURE_2D, texts[i].renderedTexture);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
@@ -153,12 +154,12 @@ function renderText() {
     frameBuffer.height = angles;
 
     gl.useProgram(shaders["lookup"]);
-    gl.uniform1f(shaders["lookup"].uWidthUniform, data.width);
-    gl.uniform1f(shaders["lookup"].uHeightUniform, data.height);
+    gl.uniform1i(shaders["lookup"].uWidthUniform, data.width);
+    gl.uniform1i(shaders["lookup"].uHeightUniform, data.height);
 
     var lookupTexture = gl.createTexture();
-    gl.activeTexture(gl.TEXTURE0 + i * 2 + 1);
-    lookupTextures[i] = i * 2 + 1;
+    gl.activeTexture(gl.TEXTURE0 + i + 1);
+    lookupTextures[i] = i + 1;
     gl.bindTexture(gl.TEXTURE_2D, lookupTexture);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
@@ -169,9 +170,9 @@ function renderText() {
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
   }
+  gl.enable(gl.BLEND);
   gl.useProgram(shaders["raytrace"]);
   gl.uniform4fv(shaders["raytrace"].uTextOffsetUniform, uniformArray);
-  gl.uniform1iv(shaders["raytrace"].uRenderedTextUniform, textTextures);
   gl.uniform1iv(shaders["raytrace"].uShadowLookupUniform, lookupTextures);
 }
 
@@ -305,6 +306,9 @@ function loadGL() {
     var tmp = canvas.getBoundingClientRect();
     mousex = evt.clientX - tmp.left;
     mousey = evt.clientY - tmp.top;
+    if (evt.target.classList.contains("glshadowtext")) {
+      lastHovered = evt.target;
+    }
   });
   overlay.addEventListener('click', function(evt) {
     if (evt.target === overlay || evt.target.classList.contains("glshadowtext")) {

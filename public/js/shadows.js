@@ -22,7 +22,7 @@ var sumError = 0;
 var lastError = 0;
 var lastTime = 0;
 
-var enabled = true;
+var enabled = false;
 
 setTimeout(function() {
   if (fpscounter < 5) {
@@ -280,12 +280,26 @@ function loadShaders(shaderList, callback) {
   }
 }
 
+function animloop() {
+  if (enabled) {
+    render();
+    requestAnimFrame(animloop);
+  }
+}
+
 function loadGL() {
   canvas = document.getElementById("glcanvas");
   var overlay = document.getElementById("overlay");
   glinfo = document.getElementById("glinfo");
   rects = overlay.getElementsByClassName("glshadow");
   texts = overlay.getElementsByClassName("glshadowtext");
+
+  var startLink = document.getElementById("start")
+  startLink.addEventListener('click', function(evt) {
+    enabled = !enabled;
+    if (enabled) setTimeout(animloop, 0);
+    evt.preventDefault();
+  });
 
   var resizeCanvas = function() {
     canvas.width = window.innerWidth;
@@ -329,6 +343,7 @@ function loadGL() {
 
   if (!gl) {
     console.log("Could not initialize WebGL!");
+    return;
   }
 
   var shaderList = {"vertex": {url: "shaders/vertex.vert"}, "raytrace": {url: "shaders/raytrace.frag"}, "lookup": {url: "shaders/lookup.frag"}};
@@ -382,11 +397,6 @@ function loadGL() {
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
     gl.enable(gl.BLEND);
 
-    (function animloop() {
-      if (enabled) {
-        render();
-        requestAnimFrame(animloop);
-      }
-    })();
+    animloop();
   });
 }

@@ -65,6 +65,7 @@ void main(void) {
           break;
         }
       }
+      if (diff < 0.00001) continue;
       for (int i = 0; i < max_texts; i++) {
         if (i >= u_texts) break;
         vec4 tmprect = u_text[i].xyxy + u_textoffset[i];

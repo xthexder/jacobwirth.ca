@@ -14,14 +14,10 @@ var iterations = 1;
 var spread = 20;
 var angles = 360;
 var maxTexts = 15;
-var targetfps = 55;
+var targetfps = 50;
 
 var lastframe = new Date().getTime();
 var fpscounter = 0;
-
-var sumError = 0;
-var lastError = 0;
-var lastTime = 0;
 
 var enabled = false;
 
@@ -108,12 +104,7 @@ function render() {
 
     glinfo.innerHTML = "FPS: " + Math.floor(fps) + "<br/>Iterations: " + Math.floor(iterations);
 
-    var error = targetfps - fps;
-    sumError += error;
-    var dError = error - lastError;
-    lastError = error;
-
-    iterations -= (0.08 * error) + (0.05 * this.sumError) + (0.05 * dError);
+    iterations *= fps / targetfps;
     if (iterations < 1) {
       iterations = 1;
     } else if (iterations > 100) {

@@ -37,29 +37,30 @@ float rand(vec2 co) {
 
 void main(void) {
   vec2 pixel = gl_FragCoord.xy;
-  float col = 0.0001;
+  float col = 0.0000;
   float maxcol = 0.0001;
   if (length(u_light - pixel) >= u_spread) {
     vec2 perp = normalize(vec2(pixel.y - u_light.y, u_light.x - pixel.x));
     vec2 realdir = normalize(pixel - u_light);
     for (int j = 0; j < 500; j++) {
       if (float(j) >= u_iterations) break;
-      float tmpx = (float(j) + 0.25) / u_iterations * 2.0 - 1.0 + rand(pixel + u_seed);
+      float tmpx = rand(pixel + u_seed) * 2.0 - 1.0 + float(j * 2) / u_iterations;
       if (tmpx > 1.0) tmpx -= 2.0;
       float tmpy = sqrt(1.0 - tmpx * tmpx);
-      vec2 offset = perp * tmpx + realdir * tmpy;
+      vec2 offset = normalize(perp * tmpx + realdir * tmpy);
       vec2 tmplight = u_light + offset * u_spread;
       vec2 dir = pixel - tmplight;
       float amax = length(dir);
       dir = normalize(dir);
-      vec2 dirfrac = vec2(1.0 / dir.x, 1.0 / dir.y);
+      vec2 dirfrac = 1.0 / dir;
 
-      float diff = max(0.0, dot(dir, offset));
+      float diff = abs(dot(dir, offset)) * u_spread / amax;
       maxcol += diff;
       for (int i = 0; i < 50; i++) {
         if (i >= u_rects) break;
         vec2 tmp = intersectAABB(tmplight, dirfrac, u_rect[i]);
         if (tmp.x < amax && tmp.y >= 0.0) {
+          if (tmp.x < 0.0) maxcol -= diff * 0.9;
           diff = 0.0;
           break;
         }
@@ -109,8 +110,7 @@ void main(void) {
               for (int k = 0; k < 1000; k++) {
                 if (test == endTile) break;
 
-                vec2 tmp = (vec2(test) + vec2(0.5)) / vec2(width, height);
-                if (texture2D(u_renderedtext, tmp).w >= 0.5) {
+                if (texture2D(u_renderedtext, vec2(test) / vec2(width, height)).w >= 0.5) {
                   diff = 0.0;
                   break;
                 }
@@ -148,7 +148,7 @@ void main(void) {
       }
       col += diff;
     }
-  }
+  } else col = maxcol;
   gl_FragColor = vec4(vec3(1.0), col / maxcol);
   //gl_FragColor = vec4(vec3(0.4, 0.8, 1.0), col / maxcol * pow(0.1, length(u_light - pixel) / 1000.0));
   //gl_FragColor = vec4(0.0353, 0.1451, 0.2, 1.0 - (col / maxcol * pow(0.1, length(u_light - pixel) / 1000.0)));

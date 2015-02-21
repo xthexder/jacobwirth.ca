@@ -1,6 +1,6 @@
 precision mediump float;
 
-const int samples = 64;
+const int samples = 16;
 
 uniform vec2 u_light;
 uniform float u_spread;

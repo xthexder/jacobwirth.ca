@@ -14,7 +14,7 @@ var iterations = 1;
 var spread = 20;
 var angles = 360;
 var maxTexts = 15;
-var targetfps = 30;
+var targetfps = 55;
 
 var lastframe = new Date().getTime();
 var fpscounter = 0;
@@ -36,9 +36,13 @@ window.requestAnimFrame = (function() {
     };
 })();
 
+var renderBuffer = false;
+var frameTexture = false;
+
 function render() {
   if (reinitRequired) initBuffers();
 
+  gl.bindFramebuffer(gl.FRAMEBUFFER, renderBuffer);
   gl.useProgram(shaders["raytrace"]);
   gl.clear(gl.COLOR_BUFFER_BIT);
 
@@ -71,7 +75,27 @@ function render() {
   gl.uniform1f(shaders["raytrace"].uSpreadUniform, spread);
   gl.uniform1f(shaders["raytrace"].uIterationsUniform, iterations);
 
-  if (mouseLight) gl.uniform2f(shaders["raytrace"].uLightUniform, mousex, gl.viewportHeight - mousey);
+  if (mouseLight) {
+    gl.uniform2f(shaders["raytrace"].uLightUniform, mousex, gl.viewportHeight - mousey);
+  } else {
+    gl.uniform2f(shaders["raytrace"].uLightUniform, gl.viewportWidth / 2, gl.viewportHeight - 50);
+  }
+
+  gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+
+  gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+  gl.useProgram(shaders["final"]);
+  gl.clear(gl.COLOR_BUFFER_BIT);
+
+  gl.activeTexture(gl.TEXTURE0);
+  gl.bindTexture(gl.TEXTURE_2D, frameTexture);
+
+  gl.uniform1f(shaders["final"].uSpreadUniform, spread);
+  if (mouseLight) {
+    gl.uniform2f(shaders["final"].uLightUniform, mousex, gl.viewportHeight - mousey);
+  } else {
+    gl.uniform2f(shaders["final"].uLightUniform, gl.viewportWidth / 2, gl.viewportHeight - 50);
+  }
 
   gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 
@@ -206,7 +230,31 @@ function initBuffers() {
   gl.uniform1f(shaders["raytrace"].uSpreadUniform, spread);
   gl.uniform1f(shaders["raytrace"].uIterationsUniform, iterations);
 
-  if (!mouseLight) gl.uniform2f(shaders["raytrace"].uLightUniform, gl.viewportWidth / 2, gl.viewportHeight - 50);
+  gl.useProgram(shaders["final"]);
+  gl.bindBuffer(gl.ARRAY_BUFFER, vertexPositionBuffer);
+  gl.uniformMatrix4fv(shaders["final"].pMatrixUniform, false, pMatrix);
+  gl.vertexAttribPointer(shaders["final"].vertexPositionAttribute, 2, gl.FLOAT, false, 0, 0);
+  gl.uniform1i(shaders["final"].uFrameUniform, 0);
+  gl.uniform1f(shaders["final"].uWidthUniform, gl.viewportWidth);
+  gl.uniform1f(shaders["final"].uHeightUniform, gl.viewportHeight);
+  gl.uniform1f(shaders["final"].uSpreadUniform, spread);
+
+  renderBuffer = gl.createFramebuffer();
+  gl.bindFramebuffer(gl.FRAMEBUFFER, renderBuffer);
+  renderBuffer.width = gl.viewportWidth;
+  renderBuffer.height = gl.viewportHeight;
+
+  frameTexture = gl.createTexture();
+  gl.activeTexture(gl.TEXTURE0);
+  gl.bindTexture(gl.TEXTURE_2D, frameTexture);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, renderBuffer.width, renderBuffer.height, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+  gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, frameTexture, 0);
+  gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+
   reinitRequired = false;
 }
 
@@ -338,7 +386,12 @@ function loadGL() {
     return;
   }
 
-  var shaderList = {"vertex": {url: "shaders/vertex.vert"}, "raytrace": {url: "shaders/raytrace.frag"}, "lookup": {url: "shaders/lookup.frag"}};
+  var shaderList = {
+    "vertex": {url: "shaders/vertex.vert"},
+    "lookup": {url: "shaders/lookup.frag"},
+    "raytrace": {url: "shaders/raytrace.frag"},
+    "final": {url: "shaders/final.frag"}
+  };
 
   setTimeout(function() {
     console.log("Loading Shaders");
@@ -353,6 +406,11 @@ function loadGL() {
       gl.attachShader(shaders["raytrace"], shaderList["vertex"].shader);
       gl.attachShader(shaders["raytrace"], shaderList["raytrace"].shader);
       gl.linkProgram(shaders["raytrace"]);
+
+      shaders["final"] = gl.createProgram();
+      gl.attachShader(shaders["final"], shaderList["vertex"].shader);
+      gl.attachShader(shaders["final"], shaderList["final"].shader);
+      gl.linkProgram(shaders["final"]);
 
       for (var name in shaders) {
         if (!gl.getProgramParameter(shaders[name], gl.LINK_STATUS)) {
@@ -385,6 +443,16 @@ function loadGL() {
       shaders["lookup"].uHeightUniform = gl.getUniformLocation(shaders["lookup"], "u_height");
 
       gl.enableVertexAttribArray(shaders["lookup"].vertexPositionAttribute);
+
+      shaders["final"].vertexPositionAttribute = gl.getAttribLocation(shaders["final"], "aVertexPosition");
+      shaders["final"].pMatrixUniform = gl.getUniformLocation(shaders["final"], "uPMatrix");
+      shaders["final"].uFrameUniform = gl.getUniformLocation(shaders["final"], "u_frame");
+      shaders["final"].uWidthUniform = gl.getUniformLocation(shaders["final"], "u_width");
+      shaders["final"].uHeightUniform = gl.getUniformLocation(shaders["final"], "u_height");
+      shaders["final"].uLightUniform = gl.getUniformLocation(shaders["final"], "u_light");
+      shaders["final"].uSpreadUniform = gl.getUniformLocation(shaders["final"], "u_spread");
+
+      gl.enableVertexAttribArray(shaders["final"].vertexPositionAttribute);
 
       gl.clearColor(0.0, 0.0, 0.0, 0.0);
       gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);

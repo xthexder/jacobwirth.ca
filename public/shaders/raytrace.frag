@@ -44,7 +44,7 @@ void main(void) {
     vec2 realdir = normalize(pixel - u_light);
     for (int j = 0; j < 500; j++) {
       if (float(j) >= u_iterations) break;
-      float tmpx = float(j) / u_iterations * 2.0 - 1.0 + rand(pixel + u_seed);
+      float tmpx = (float(j) + 0.25) / u_iterations * 2.0 - 1.0 + rand(pixel + u_seed);
       if (tmpx > 1.0) tmpx -= 2.0;
       float tmpy = sqrt(1.0 - tmpx * tmpx);
       vec2 offset = perp * tmpx + realdir * tmpy;
@@ -123,7 +123,7 @@ void main(void) {
                   test.y += stepY;
                 }
               }
-              if (diff <= 0.00001) break;
+              if (diff == 0.0) break;
             } else if (minmax.x < 0.0) {
               if (minmax.y >= 0.0) {
                 // [ L ] P
@@ -149,7 +149,8 @@ void main(void) {
       col += diff;
     }
   }
-  gl_FragColor = vec4(vec3(0.4, 0.8, 1.0), col / maxcol * pow(0.1, length(u_light - pixel) / 1000.0));
+  gl_FragColor = vec4(vec3(1.0), col / maxcol);
+  //gl_FragColor = vec4(vec3(0.4, 0.8, 1.0), col / maxcol * pow(0.1, length(u_light - pixel) / 1000.0));
   //gl_FragColor = vec4(0.0353, 0.1451, 0.2, 1.0 - (col / maxcol * pow(0.1, length(u_light - pixel) / 1000.0)));
   /*vec4 tmprect = u_text[0].xyxy + u_textoffset[0];
   float width = tmprect.z - tmprect.x;

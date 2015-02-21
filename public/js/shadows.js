@@ -60,10 +60,10 @@ function render() {
     uniformArray[i * 4 + 2] = tmp.right - tmpcanvas.left;
     uniformArray[i * 4 + 3] = gl.viewportHeight - tmp.top + tmpcanvas.top;
   }
-  if (lastHovered) {
-    gl.activeTexture(gl.TEXTURE0);
-    gl.bindTexture(gl.TEXTURE_2D, lastHovered.renderedTexture);
-  }
+
+  gl.activeTexture(gl.TEXTURE0);
+  gl.bindTexture(gl.TEXTURE_2D, lastHovered.renderedTexture);
+
   gl.uniform4fv(shaders["raytrace"].uTextUniform, uniformArray);
   gl.uniform1i(shaders["raytrace"].uRectsUniform, rects.length);
   gl.uniform1i(shaders["raytrace"].uTextsUniform, texts.length);
@@ -245,6 +245,8 @@ function initBuffers() {
   gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, renderBuffer.width, renderBuffer.height, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
   gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, frameTexture, 0);
   gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+
+  if (!lastHovered) lastHovered = texts[0];
 
   reinitRequired = false;
 }

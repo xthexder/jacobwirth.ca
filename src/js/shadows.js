@@ -38,7 +38,7 @@ var renderBuffer = false;
 var frameTexture = false;
 
 function render() {
-  if (reinitRequired) initBuffers();
+  if (reinitRequired) reinitBuffers();
 
   gl.bindFramebuffer(gl.FRAMEBUFFER, renderBuffer);
   gl.useProgram(shaders["raytrace"]);
@@ -191,51 +191,63 @@ function renderText() {
   gl.uniform1iv(shaders["raytrace"].uShadowLookupUniform, lookupTextures);
 }
 
+function reinitBuffers() {
+  if (!gl || !shaders["raytrace"] || !shaders["lookup"]) return;
+
+  gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
+
+  gl.useProgram(shaders["raytrace"]);
+  gl.uniform1f(shaders["raytrace"].uSeedUniform, Math.random() * gl.viewportWidth * 10);
+
+  gl.useProgram(shaders["final"]);
+  gl.uniform1f(shaders["final"].uWidthUniform, gl.viewportWidth);
+  gl.uniform1f(shaders["final"].uHeightUniform, gl.viewportHeight);
+
+  renderBuffer.width = gl.viewportWidth;
+  renderBuffer.height = gl.viewportHeight;
+
+  gl.activeTexture(gl.TEXTURE0);
+  gl.bindTexture(gl.TEXTURE_2D, frameTexture);
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, renderBuffer.width, renderBuffer.height, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+
+  reinitRequired = false;
+}
+
 function initBuffers() {
   if (!gl || !shaders["raytrace"] || !shaders["lookup"]) return;
 
   var vertexPositionBuffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, vertexPositionBuffer);
-  vertices = [
-    gl.viewportWidth,  gl.viewportHeight,
-    0.0,  gl.viewportHeight,
-    gl.viewportWidth, 0.0,
-    0.0, 0.0
-  ];
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
+  var vertices = new Float32Array([
+    1, 1,
+    0, 1,
+    1, 0,
+    0, 0
+  ]);
+  gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
 
   var pMatrix = new Float32Array([
-     1,  0,  0,  0,
-     0,  1,  0,  0,
-     0,  0,  1,  0,
+     2,  0,  0,  0,
+     0,  2,  0,  0,
+     0,  0,  2,  0,
     -1, -1, -1,  1
   ]);
-  gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
 
   gl.useProgram(shaders["lookup"]);
-  gl.bindBuffer(gl.ARRAY_BUFFER, vertexPositionBuffer);
   gl.uniformMatrix4fv(shaders["lookup"].pMatrixUniform, false, pMatrix);
   gl.vertexAttribPointer(shaders["lookup"].vertexPositionAttribute, 2, gl.FLOAT, false, 0, 0);
   gl.uniform1i(shaders["lookup"].uRenderedTextUniform, 0);
 
   gl.useProgram(shaders["raytrace"]);
-  gl.bindBuffer(gl.ARRAY_BUFFER, vertexPositionBuffer);
   gl.uniformMatrix4fv(shaders["raytrace"].pMatrixUniform, false, pMatrix);
   gl.vertexAttribPointer(shaders["raytrace"].vertexPositionAttribute, 2, gl.FLOAT, false, 0, 0);
   gl.uniform1i(shaders["raytrace"].uRenderedTextUniform, 0);
   gl.uniform1i(shaders["raytrace"].uShadowLookupUniform, 1);
-  gl.uniform1f(shaders["raytrace"].uSeedUniform, Math.random() * gl.viewportWidth * 10);
-  gl.uniform1f(shaders["raytrace"].uSpreadUniform, spread);
-  gl.uniform1f(shaders["raytrace"].uIterationsUniform, iterations);
 
   gl.useProgram(shaders["final"]);
-  gl.bindBuffer(gl.ARRAY_BUFFER, vertexPositionBuffer);
   gl.uniformMatrix4fv(shaders["final"].pMatrixUniform, false, pMatrix);
   gl.vertexAttribPointer(shaders["final"].vertexPositionAttribute, 2, gl.FLOAT, false, 0, 0);
   gl.uniform1i(shaders["final"].uFrameUniform, 0);
-  gl.uniform1f(shaders["final"].uWidthUniform, gl.viewportWidth);
-  gl.uniform1f(shaders["final"].uHeightUniform, gl.viewportHeight);
-  gl.uniform1f(shaders["final"].uSpreadUniform, spread);
 
   renderBuffer = gl.createFramebuffer();
   gl.bindFramebuffer(gl.FRAMEBUFFER, renderBuffer);
@@ -255,7 +267,7 @@ function initBuffers() {
 
   if (!lastHovered) lastHovered = texts[0];
 
-  reinitRequired = false;
+  reinitBuffers();
 }
 
 function ajaxGet(url, callback) {
@@ -335,6 +347,7 @@ function animloop() {
 (function() {
   canvas = document.getElementById("glcanvas");
   var overlay = document.getElementById("overlay");
+  var header = document.getElementById("header");
   glinfo = document.getElementById("glinfo");
   rects = overlay.getElementsByClassName("glshadow");
   texts = overlay.getElementsByClassName("glshadowtext");
@@ -367,7 +380,8 @@ function animloop() {
     }
   });
   overlay.addEventListener('click', function(evt) {
-    if (evt.target === overlay || evt.target.classList.contains("glshadowtext")) {
+    console.log(evt.target);
+    if (!evt.target.classList.contains("project") && !header.contains(evt.target)) {
       mouseLight = !mouseLight;
       var tmp = canvas.getBoundingClientRect();
       mousex = evt.clientX - tmp.left;
@@ -452,6 +466,8 @@ function animloop() {
       shaders["final"].uSpreadUniform = gl.getUniformLocation(shaders["final"], "u_spread");
 
       gl.enableVertexAttribArray(shaders["final"].vertexPositionAttribute);
+
+      initBuffers();
 
       gl.clearColor(0.0, 0.0, 0.0, 0.0);
       gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);

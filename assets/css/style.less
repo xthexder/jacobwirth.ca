@@ -28,6 +28,8 @@ html {
     background: #092533;
     height: 100%;
 
+    font-family: "Source Sans Pro";
+
     #header {
       position: fixed;
       top: 0;
@@ -59,18 +61,13 @@ html {
             color: rgba(255, 255, 255, 0.8);
             text-shadow: 0px 0px 10px black;
 
-            transition: color 300ms;
-            -moz-transition: color 300ms;
-            -webkit-transition: color 300ms;
-            -o-transition: color 300ms;
+            .transition(color 400ms);
 
             &:hover {
               color: rgba(255, 255, 20, 0.8);
 
-              transition: color 50ms;
-              -moz-transition: color 50ms;
-              -webkit-transition: color 50ms;
-              -o-transition: color 50ms;
+              .animation(text-glow 1s);
+              .transition(color 100ms);
             }
           }
         }
@@ -98,21 +95,15 @@ html {
       overflow-y: hidden;
 
       .glshadow {
-        position: absolute;
         background: #444444;
       }
 
-      .glshadowtext#title {
-        font-size: 80px;
-
-        margin-top: 300px;
-        margin-left: 500px;
+      .glshadowtext {
+        overflow: hidden;
       }
 
-      .glshadowtext#test {
-        font-size: 80px;
-        margin-left: 100px;
-        margin-top: 100px;
+      .category {
+        margin-top: 50px;
       }
 
       @import 'project';

@@ -56,7 +56,7 @@ function render() {
   gl.uniform4fv(shaders["raytrace"].uRectUniform, uniformArray);
   uniformArray = new Float32Array(maxTexts * 4);
   for (var i = 0; i < texts.length && i < maxTexts; i++) {
-    var tmp = texts[i].getBoundingClientRect();
+    var tmp = texts[i].firstChild.getBoundingClientRect();
     uniformArray[i * 4] = tmp.left - tmpcanvas.left;
     uniformArray[i * 4 + 1] = gl.viewportHeight - tmp.bottom + tmpcanvas.top;
     uniformArray[i * 4 + 2] = tmp.right - tmpcanvas.left;
@@ -118,9 +118,9 @@ function render() {
 function renderText() {
   var uniformArray = new Float32Array(maxTexts * 4);
   var lookupTextures = new Int32Array(maxTexts);
-  gl.disable(gl.BLEND);
+  if (enabled) gl.disable(gl.BLEND);
   for (var i = 0; i < texts.length && i < maxTexts; i++) {
-    var ctx = texts[i].getContext('2d');
+    var ctx = texts[i].firstChild.getContext('2d');
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
     var style = window.getComputedStyle(texts[i]);
@@ -128,7 +128,7 @@ function renderText() {
     ctx.textAlign = "left";
     ctx.textBaseline = "top";
     ctx.font = style.getPropertyValue("font-size") + " " + style.getPropertyValue("font-family");
-    ctx.fillText(texts[i].innerHTML, 1, 1);
+    ctx.fillText(texts[i].firstChild.innerHTML, 1, 1);
 
     var data = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height);
     var minx = ctx.canvas.width - 1;
@@ -150,6 +150,11 @@ function renderText() {
     uniformArray[i * 4 + 2] = maxx + 2;
     uniformArray[i * 4 + 3] = ctx.canvas.height - miny + 1;
     data = ctx.getImageData(minx - 1, miny - 1, maxx - minx + 2, maxy - miny + 2);
+
+    texts[i].style.width = (maxx + minx + 2) + "px";
+    texts[i].style.height = (maxy + miny + 2) + "px";
+
+    if (!enabled) continue;
 
     texts[i].renderedTexture = gl.createTexture();
     gl.activeTexture(gl.TEXTURE0);
@@ -184,6 +189,7 @@ function renderText() {
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
   }
+  if (!enabled) return;
   gl.enable(gl.BLEND);
   gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
   gl.useProgram(shaders["raytrace"]);
@@ -397,6 +403,8 @@ function animloop() {
     console.log("Could not initialize WebGL!");
     return;
   }
+
+  renderText();
 
   var shaderList = {
     "vertex": {url: "shaders/vertex.vert"},

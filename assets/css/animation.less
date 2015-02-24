@@ -1,0 +1,21 @@
+@-webkit-keyframes text-glow {.text-glow;}
+@-o-keyframes text-glow {.text-glow;}
+@keyframes text-glow {.text-glow;}
+
+.animation (...) {
+  -webkit-animation: @arguments;
+  animation: @arguments;
+}
+
+.text-glow() {
+  0% { text-shadow: 0 0 10px black; }
+  10% { text-shadow: 0 0 5px rgba(255, 255, 20, 0.3); }
+  100% { text-shadow: 0 0 10px black; }
+}
+
+.transition (...) {
+  transition: @arguments;
+  -moz-transition: @arguments;
+  -webkit-transition: @arguments;
+  -o-transition: @arguments;
+}

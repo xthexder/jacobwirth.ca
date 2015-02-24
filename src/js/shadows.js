@@ -106,7 +106,7 @@ function render() {
 
     glinfo.innerHTML = "FPS: " + Math.floor(fps) + "<br/>Iterations: " + Math.floor(iterations);
 
-    iterations *= fps / targetfps;
+    iterations = Math.sin(fpscounter / 100.0) * 5 + 6;//*= (1 + fps / targetfps) / 2.0;
     if (iterations < 1) {
       iterations = 1;
     } else if (iterations > 100) {
@@ -380,7 +380,6 @@ function animloop() {
     }
   });
   overlay.addEventListener('click', function(evt) {
-    console.log(evt.target);
     if (!evt.target.classList.contains("project") && !header.contains(evt.target)) {
       mouseLight = !mouseLight;
       var tmp = canvas.getBoundingClientRect();

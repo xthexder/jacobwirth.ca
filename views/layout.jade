@@ -1,17 +1,17 @@
 doctype html
-html
+html(lang='en')
   head
+    meta(charset='utf-8')
     title
       block title
     //if lt IE 9
       script(src='http://html5shim.googlecode.com/svn/trunk/html5.js')
     link(type='text/css', rel='stylesheet', href='/master.css')
+    meta(name='author', content='Jacob Wirth')
     meta(name='viewport', content='width=device-width, initial-scale=1')
-    script(src='/js/glMatrix-0.9.5.min.js')
-    script(src='/js/shadows.js')
     block head
 
-  body(onload='loadGL()')
+  body
     #overlay
       header#header
         nav
@@ -27,3 +27,4 @@ html
     #tint
     canvas#glcanvas(width='640', height='480')
       | Your browser doesn't appear to support the HTML5 &lt;canvas&gt; element.
+    script(src='/js/shadows.js')

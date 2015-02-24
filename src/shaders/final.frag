@@ -1,3 +1,4 @@
+// Copyright © 2015 Jacob Wirth
 precision mediump float;
 
 const int samples = 16;

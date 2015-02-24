@@ -1,8 +1,8 @@
 jacobwirth.ca
-========
+=============
 
-Server side code for http://www.jacobwirth.ca/
+Source code for http://jacobwirth.ca/ and http://wirth.io/
 
-This site is created using a node.js backend with Express.js, Jade and Less.
+CSS assets are generated using Less (see Makefile).
 
-Copyright 2012 Jacob Wirth
+Copyright 2015 Jacob Wirth

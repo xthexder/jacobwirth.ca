@@ -1,4 +1,4 @@
 node_modules
 npm-debug.log
-public/master.css
-public/resume.css
+src/*.css
+src/*.html

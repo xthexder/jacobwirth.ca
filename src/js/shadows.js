@@ -1,3 +1,5 @@
+// Copyright © 2015 Jacob Wirth
+
 var gl = false;
 var canvas, glinfo;
 var rects = [];
@@ -202,7 +204,12 @@ function initBuffers() {
   ];
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
 
-  var pMatrix = mat4.ortho(0, gl.viewportWidth, gl.viewportHeight, 0, 0.001, 100000);
+  var pMatrix = new Float32Array([
+     1,  0,  0,  0,
+     0,  1,  0,  0,
+     0,  0,  1,  0,
+    -1, -1, -1,  1
+  ]);
   gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
 
   gl.useProgram(shaders["lookup"]);
@@ -325,7 +332,7 @@ function animloop() {
   }
 }
 
-function loadGL() {
+(function() {
   canvas = document.getElementById("glcanvas");
   var overlay = document.getElementById("overlay");
   glinfo = document.getElementById("glinfo");
@@ -365,7 +372,6 @@ function loadGL() {
       var tmp = canvas.getBoundingClientRect();
       mousex = evt.clientX - tmp.left;
       mousey = evt.clientY - tmp.top;
-      reinitRequired = true;
     }
   });
   var scrollEvent = function(evt) {
@@ -459,4 +465,4 @@ function loadGL() {
       });
     });
   }, 0);
-}
+})();

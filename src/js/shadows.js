@@ -106,7 +106,7 @@ function render() {
 
     glinfo.innerHTML = "FPS: " + Math.floor(fps) + "<br/>Iterations: " + Math.floor(iterations);
 
-    iterations = Math.sin(fpscounter / 100.0) * 5 + 6;//*= (1 + fps / targetfps) / 2.0;
+    iterations *= (1 + fps / targetfps) / 2.0;
     if (iterations < 1) {
       iterations = 1;
     } else if (iterations > 100) {

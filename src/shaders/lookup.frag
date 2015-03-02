@@ -1,12 +1,11 @@
 // Copyright © 2015 Jacob Wirth
 precision mediump float;
 
-uniform int u_width;
-uniform int u_height;
+uniform float u_width;
+uniform float u_height;
+uniform float u_angles;
 uniform sampler2D u_renderedtext;
 
-int perimeter = (u_width + u_height) * 2;
-const float angles = 360.0;
 const float c_pi = 3.141592653589793;
 
 vec2 rayTrace(vec2 org, vec2 dirfrac) {
@@ -14,18 +13,18 @@ vec2 rayTrace(vec2 org, vec2 dirfrac) {
   int stepY = dirfrac.y > 0.0 ? 1 : -1;
   vec2 delta = abs(dirfrac.yx * 1000.0);
 
-  float maxX = stepX > 0 ? delta.x : 0.0;
-  float maxY = stepY > 0 ? delta.y : 0.0;
+  float maxX = delta.x * ((stepX > 0) ? (1.0 - fract(org.x)) : fract(org.x));
+  float maxY = delta.y * ((stepY > 0) ? (1.0 - fract(org.y)) : fract(org.y));
   ivec2 test = ivec2(org);
 
-  float mind = 100000.0;
+  float mind = 65535.0;
   float maxd = 0.0;
 
   for (int i = 0; i < 10000; i++) {
-    if (test.x < 0 || test.x >= u_width || test.y < 0 || test.y >= u_height) break;
+    if (test.x < 0 || test.x > int(u_width) || test.y < 0 || test.y > int(u_height)) break;
     vec4 tmp = texture2D(u_renderedtext, (vec2(test) + vec2(0.5)) / vec2(u_width, u_height));
     if (tmp.w > 0.5) {
-      float dist = length(vec2(test) - org);
+      float dist = length(vec2(test) - org + vec2(0.5));
       mind = min(mind, dist);
       maxd = max(maxd, dist);
     }
@@ -50,36 +49,36 @@ vec4 packVec2(vec2 vec) {
 }
 
 void main(void) {
-  float angle = (gl_FragCoord.y + 0.5) * c_pi * 2.0 / angles;
-  int index = int(gl_FragCoord.x);
+  float angle = (gl_FragCoord.y - 0.5) * c_pi * 2.0 / u_angles;
+  float index = gl_FragCoord.x;
   vec2 dirfrac = vec2(cos(angle), sin(angle));
   if (index < u_width) { // Bottom
     if (dirfrac.y >= 0.0) {
       vec2 tmp = rayTrace(vec2(index, 0.0), dirfrac);
       gl_FragColor = packVec2(tmp);
     } else {
-      gl_FragColor = vec4(0.0);
+      gl_FragColor = vec4(1.0, 1.0, 0.0, 0.0);
     }
   } else if (index < u_width + u_height) { // Right
     if (dirfrac.x <= 0.0) {
-      vec2 tmp = rayTrace(vec2(u_width - 1, index - u_width), dirfrac);
+      vec2 tmp = rayTrace(vec2(u_width, index - u_width), dirfrac);
       gl_FragColor = packVec2(tmp);
     } else {
-      gl_FragColor = vec4(0.0);
+      gl_FragColor = vec4(1.0, 1.0, 0.0, 0.0);
     }
-  } else if (index < u_width * 2 + u_height) { // Top
+  } else if (index < u_width * 2.0 + u_height) { // Top
     if (dirfrac.y <= 0.0) {
-      vec2 tmp = rayTrace(vec2(u_width * 2 + u_height - index - 1, u_height - 1), dirfrac);
+      vec2 tmp = rayTrace(vec2(u_width * 2.0 + u_height - index, u_height), dirfrac);
       gl_FragColor = packVec2(tmp);
     } else {
-      gl_FragColor = vec4(0.0);
+      gl_FragColor = vec4(1.0, 1.0, 0.0, 0.0);
     }
   } else { // Left
     if (dirfrac.x >= 0.0) {
-      vec2 tmp = rayTrace(vec2(0.0, (u_width + u_height) * 2 - index - 1), dirfrac);
+      vec2 tmp = rayTrace(vec2(0.0, (u_width + u_height) * 2.0 - index), dirfrac);
       gl_FragColor = packVec2(tmp);
     } else {
-      gl_FragColor = vec4(0.0);
+      gl_FragColor = vec4(1.0, 1.0, 0.0, 0.0);
     }
   }
 }

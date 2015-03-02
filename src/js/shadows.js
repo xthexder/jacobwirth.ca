@@ -14,7 +14,7 @@ var mousex = 0;
 var mousey = 0;
 var iterations = 1;
 var spread = 20;
-var angles = 360;
+var angles = 1000;
 var maxTexts = 15;
 var targetfps = 50;
 
@@ -140,15 +140,15 @@ function renderText() {
         if (data.data[(x + y * ctx.canvas.width) * 4 + 3] != 0) {
           minx = Math.min(minx, x);
           miny = Math.min(miny, y);
-          maxx = Math.max(maxx, x);
-          maxy = Math.max(maxy, y);
+          maxx = Math.max(maxx, x + 1);
+          maxy = Math.max(maxy, y + 1);
         }
       }
     }
     uniformArray[i * 4] = minx - 1;
-    uniformArray[i * 4 + 1] = ctx.canvas.height - maxy - 2;
-    uniformArray[i * 4 + 2] = maxx + 2;
-    uniformArray[i * 4 + 3] = ctx.canvas.height - miny + 1;
+    uniformArray[i * 4 + 1] = (ctx.canvas.height - 1) - (maxy + 1);
+    uniformArray[i * 4 + 2] = maxx + 1;
+    uniformArray[i * 4 + 3] = (ctx.canvas.height - 1) - (miny - 1);
     data = ctx.getImageData(minx - 1, miny - 1, maxx - minx + 2, maxy - miny + 2);
 
     texts[i].style.width = (maxx + minx + 2) + "px";
@@ -173,8 +173,9 @@ function renderText() {
     gl.viewport(0, 0, frameBuffer.width, frameBuffer.height);
 
     gl.useProgram(shaders["lookup"]);
-    gl.uniform1i(shaders["lookup"].uWidthUniform, data.width);
-    gl.uniform1i(shaders["lookup"].uHeightUniform, data.height);
+    gl.uniform1f(shaders["lookup"].uWidthUniform, data.width);
+    gl.uniform1f(shaders["lookup"].uHeightUniform, data.height);
+    gl.uniform1f(shaders["lookup"].uAnglesUniform, angles);
 
     var lookupTexture = gl.createTexture();
     gl.activeTexture(gl.TEXTURE0 + i + 1);
@@ -461,6 +462,7 @@ function animloop() {
       shaders["lookup"].uRenderedTextUniform = gl.getUniformLocation(shaders["lookup"], "u_renderedtext");
       shaders["lookup"].uWidthUniform = gl.getUniformLocation(shaders["lookup"], "u_width");
       shaders["lookup"].uHeightUniform = gl.getUniformLocation(shaders["lookup"], "u_height");
+      shaders["lookup"].uAnglesUniform = gl.getUniformLocation(shaders["lookup"], "u_angles");
 
       gl.enableVertexAttribArray(shaders["lookup"].vertexPositionAttribute);
 

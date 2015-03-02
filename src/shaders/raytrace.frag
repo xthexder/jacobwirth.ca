@@ -55,7 +55,7 @@ void main(void) {
       dir = normalize(dir);
       vec2 dirfrac = 1.0 / dir;
 
-      float diff = 1.0;//abs(dot(dir, offset)) * (u_spread + 1.0) / amax;
+      float diff = abs(dot(dir, offset)) * (u_spread + 1.0) / amax;
       maxcol += diff;
       for (int i = 0; i < 50; i++) {
         if (i >= u_rects) break;

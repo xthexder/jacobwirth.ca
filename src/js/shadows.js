@@ -145,9 +145,9 @@ function renderText() {
       }
     }
     uniformArray[i * 4] = minx - 1;
-    uniformArray[i * 4 + 1] = (ctx.canvas.height - 1) - (maxy + 1);
+    uniformArray[i * 4 + 1] = ctx.canvas.height - maxy - 1;
     uniformArray[i * 4 + 2] = maxx + 1;
-    uniformArray[i * 4 + 3] = (ctx.canvas.height - 1) - (miny - 1);
+    uniformArray[i * 4 + 3] = ctx.canvas.height - miny + 1;
     data = ctx.getImageData(minx - 1, miny - 1, maxx - minx + 2, maxy - miny + 2);
 
     texts[i].style.width = (maxx + minx + 2) + "px";

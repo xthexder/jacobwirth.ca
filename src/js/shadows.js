@@ -14,7 +14,6 @@ var mousex = 0;
 var mousey = 0;
 var iterations = 1;
 var spread = 20;
-var angles = 1000;
 var maxTexts = 15;
 var targetfps = 50;
 
@@ -165,6 +164,9 @@ function renderText() {
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, data);
+
+    var angles = Math.max(180, data.width, data.height) * 2;
+    // console.log("Number of angles:", angles);
 
     var frameBuffer = gl.createFramebuffer();
     gl.bindFramebuffer(gl.FRAMEBUFFER, frameBuffer);

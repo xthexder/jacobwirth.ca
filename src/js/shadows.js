@@ -1,4 +1,5 @@
 // Copyright © 2015 Jacob Wirth
+debugger;
 
 var gl = false;
 var canvas, glinfo;

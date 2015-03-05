@@ -377,6 +377,11 @@ function animloop() {
   window.addEventListener('resize', resizeCanvas);
 
   gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
+  if (!gl) {
+    console.log("Could not initialize WebGL!");
+    return;
+  }
+
   gl.viewportWidth = canvas.width;
   gl.viewportHeight = canvas.height;
 
@@ -401,11 +406,6 @@ function animloop() {
   };
   overlay.addEventListener('DOMMouseScroll', scrollEvent);
   overlay.addEventListener('mousewheel', scrollEvent);
-
-  if (!gl) {
-    console.log("Could not initialize WebGL!");
-    return;
-  }
 
   renderText();
 

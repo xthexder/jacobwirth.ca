@@ -45,7 +45,7 @@ void main(void) {
     vec2 realdir = normalize(pixel - u_light);
     for (int j = 0; j < 500; j++) {
       if (float(j) >= u_iterations) break;
-      float tmpx = rand(pixel + u_seed) * 2.0 - 1.0 + float(j * 2) / u_iterations;
+      float tmpx = rand(pixel + u_seed * float(j + 1) / floor(u_iterations)) * 2.0 - 1.0;
       if (tmpx > 1.0) tmpx -= 2.0;
       float tmpy = sqrt(1.0 - tmpx * tmpx);
       vec2 offset = normalize(perp * tmpx + realdir * tmpy);

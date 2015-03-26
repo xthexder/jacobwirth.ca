@@ -30,11 +30,11 @@ html
       table
         tr
           th.left February 2015
-          th Portfolio:
+          th
           th.right Contact:
         tr
           td.left Home Address: Ottawa ON, Canada
-          td: a(href='http://www.jacobwirth.ca') jacobwirth.ca
+          td Github: xthexder
           td.right jacob.wirth@sympatico.ca
         tr
           td.left School Address: Waterloo ON, Canada
@@ -58,56 +58,45 @@ html
               * Concurrent program design
               * HTTP / other networking experience
               * Experience with testing libraries (TDD)
-            * C, C++ (3 years), OpenGL, GLSL (1 year)
+            * C, C++ (3 years), OpenGL, GLSL (2 years)
               * Experience with 3D rendering techniques
-            * Visual Basic, C#, .NET (2 years)
-            * Bash / Shell scripting (1 year)
-            * Basic experience with: Python, Scala, Flash
-          * Operating Systems
-            * Linux: Arch Linux, Debian, Ubuntu, CentOS
-            * Mac OS X
-            * Microsoft Windows
-            * Mobile: Android, Windows
+            * Bash / Shell scripting (2 years)
+          * Databases
+            * MySQL, Sqlite, PostgreSQL, MongoDB
           * Source Control
-            * Git, Mercurial
-            * Subversion
+            * Git, Mercurial, Subversion
             * Travis CI, CircleCI, Jenkins CI
 
       section
         :markdown
           * Web Experience
             * Markups and Syntax:
-              * HTML, Jade, XML
-              * CSS, LESS, Stylus
+              * HTML, CSS, Various Templating Languages
               * JSON, Yaml, Regular Expressions
             * Client Side:
               * Javascript, jQuery, AJAX (6 years)
-              * Angular.js, Batman.js, D3.js (1 year)
+              * Angular.js, various other libraries (1 year)
             * Server Side:
               * Golang (3 years)
               * Node.js (4 years)
               * Ruby (2 year)
               * PHP (4 years)
-            * Web Services: Nginx, Apache, Varnish
-          * Databases
-            * MySQL, Sqlite, PostgreSQL
-            * MongoDB
+            * Web Services: Nginx, Varnish, Apache
+          * Operating Systems
+            * Linux: Arch Linux, Debian, Ubuntu, CentOS
+            * Mac OS X, Microsoft Windows
           * Hardware Experience
-            * Desktop and server assembly
-            * Networking equipment operation and setup
+            * Programming embedded systems
             * Circuit design / assembly, board design, soldering
-            * Hardware lab equipment operation
-            * AV Experience
-              * Sound board, lighting board, and spotlight operation
-              * Microphone, speaker, soundboard, and light setup
+            * Operating hardware test equipment
 
-    article
+    article#work-experience
       h2 Work Experience
 
       :markdown
         ### Developer Intern - Shopify Inc
         * September 2014 - December 2014 (Stack / Resiliency Team)
-          * Developed Toxiproxy for resiliency testing
+          * Developed [Toxiproxy](https://github.com/Shopify/toxiproxy) for resiliency testing
           * Improved existing "chaos monkey" resiliency testing service
           * Helped with development of Liquid-c
         * January 2014 - April 2014 (Operations Team)
@@ -120,25 +109,11 @@ html
           * Developed some credit card processing code/services
 
         ### Software Developer - Sage Data Solutions
-        * Summer 2012
-          * Reverse engineered and converted old Visual FoxPro code to Visual Basic
-          * Updated existing software to fix bugs and improve efficiency  
-            (Cut down 10 minute database sync to less than 30 seconds, Fixed sync and UI corner cases)
+        * Summer 2012 and 2011
+          * Updated existing software to fix bugs and improve performance
           * Developed a web reporting utility to fit the needs of a client
-          * Set up an in-house rack server
-          * Technologies Used: Visual Basic, PostgreSQL, HTML, CSS, ASP.NET, Visual FoxPro
-        * Summer 2011
-          * Tested new software features for quality assurance
-          * Developed a new piece of software for tracking security patrols  
-            (Implemented on Desktop, Handheld, and Web)
-          * Technologies Used: Visual C#, PostgreSQL, ASP.NET, HTML, CSS, Mercurial
-
-        ### Audio Visual Technician - Ottawa Carleton District School Board
-        * 2011 - 2012
-          * Set up lighting and sound equipment for events hosted at Sir Robert Borden High School
-          * Determined sound and lighting needs by meeting with clients
-          * Operated sound board, lighting board, and spotlight for several performances  
-            (Feature Length Play, SRB Concert Band Performances, SRB Talent Show)
+          * Developed a new piece of software for tracking security patrols (On Desktop, Handheld, and Web)
+          * Technologies Used: Visual C#, Visual Basic, PostgreSQL, HTML, CSS, ASP.NET, Mercurial
 
     .page_break
 
@@ -146,29 +121,39 @@ html
       h2 Relevant Projects
       h3
         | For more details, source code, and other projects see 
-        a(href='http://jacobwirth.ca') jacobwirth.ca
+        a(href='https://github.com/xthexder') xthexder
+        |  and 
+        a(href='https://github.com/frustra') frustra
+        |  on github.
       br
 
       :markdown
-        * Wat Do - Time Management Utility (2012)
+        * [mods.io](https://mods.io/index) - Minecraft Mod Hosting (2014)
+          * File hosting for Minecraft mods that pays authors a revenue share
+          * Created using Golang, Revel, Gorp, MySQL, Redis
+        * cdn.frustra.org - Custom built, high performance CDN (2014)
+          * Serves files for [mods.io](https://mods.io/mods) and [portal2sounds.com](http://www.portal2sounds.com)
+          * Location based routing, low cost, high benchmark figures (4000 req/s per $5 server!)
+          * Created using Varnish, nginx (For SSL proxying), Route53 (DNS), DigitalOcean servers
+        * [BBCode Compiler](https://github.com/frustra/bbcode) (2014)
+          * A very fast BBCode parser and compiler for rendering html pages
+          * Created using Golang
+        * [Wat Do?](http://wat-do.com) - Time Management Utility (2013)
           * Prioritizes and displays assignments in an easy to use web interface
           * Created using Node.js, Jade, LESS, MongoDB
-        * Custom 3D Renderer (2012)
+        * [Custom 3D Renderer](https://github.com/xthexder/3d-projector) (2012)
           * Renders objects on the CPU without using any external libraries
-          * Rendering method similar to that of OpenGL
           * Created using Java
         * Real-Time Fractal Generator (2012)
           * Renders an interactive Julia Set using the GPU
           * Created using GLSL, OpenGL, and C++
-        * TetrUs - Co-operative Multiplayer Tetris (2011)
+        * [TetrUs](http://tetrus.frustra.org/) - Co-operative Multiplayer Tetris (2011)
           * Uses peer-to-peer networking for connecting between players
-          * Created using Java and Java Sockets
+          * Created using Node.js, Javascript, Web Sockets and WebRTC
+          * Originally created using Java and Java Sockets
         * MyCraft - Minecraft Mod Loader (2011)
-          * Uses java bytecode manipulation to modify minecraft
+          * Uses java bytecode manipulation to modify minecraft and load mods
           * Created using Java, ASM Library (Previously used BCEL)
-        * UberSand - Basic Particle Physics Simulator (2010)
-          * Simulates particle densisty and surface tension
-          * Created using Java
 
     article
       h2 Awards and Achievements
@@ -180,8 +165,8 @@ html
           * Proficiency Award in Computer Science (Sir Robert Borden High School, 2011)
           * Honourable Mention, Canadian Computing Competition (University of Waterloo, Senior, [2011](http://cemc.uwaterloo.ca/contests/computing/2011/stage1/2011CCCStage1Results.pdf) and [2012](http://cemc.uwaterloo.ca/contests/computing/2012/stage1/2012CCCStage1Results.pdf))
           * Completed [Stripe - Capture the Flag 2.0](https://stripe.com/blog/capture-the-flag-20), #709, 2012)
-          * Completed / 1st Place [Stripe - CTF3](https://stripe.com/blog/ctf3-launch) ([#1](https://github.com/xthexder/stripe-ctf-3.0), 2014)
-          * Top 10 ranking on several Dwite.ca programming contents rounds (2010 - 2012, Team: [Pikachu Bread](http://dwite.ca/home/team/603))
+          * Completed / 1st Place [Stripe - CTF3](https://stripe.com/blog/ctf3-launch) (#1, 2014) [Writeup](https://github.com/xthexder/stripe-ctf-3.0)
+          * Top 10 ranking on several Dwite.ca programming contents rounds (2010 - 2012, Team: [Pikachu Bread](http://dwite.ca/home/team/603.html))
 
     article
       h2 Education

@@ -4,7 +4,7 @@
   "private": true,
   "dependencies": {},
   "devDependencies": {
-    "jade": "*",
+    "jade": "1.9.0",
     "markdown": "0.4.0",
     "less": "1.3.1"
   }

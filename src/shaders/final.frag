@@ -10,6 +10,10 @@ uniform float u_height;
 
 uniform sampler2D u_frame;
 
+float rand(vec2 co) {
+  return fract(sin(dot(co.xy, vec2(12.9898, 78.233))) * 43758.5453);
+}
+
 void main(void) {
   vec2 pixel = gl_FragCoord.xy;
   vec2 dir = normalize(pixel - u_light);
@@ -35,8 +39,9 @@ void main(void) {
     countf++;
     sample += dir;
   }
+  float dither = 50.0 * rand(pixel + dir);
   float val = min(sumb / countb, texture2D(u_frame, pixel / vec2(u_width, u_height)).w);
   val = max(sumf / countf, val);
-  gl_FragColor = vec4(vec3(0.4, 0.8, 1.0), val * pow(0.1, dist / 1000.0));
+  gl_FragColor = vec4(vec3(0.4, 0.8, 1.0), val * pow(0.1, dist / (1000.0 + dither)));
   // gl_FragColor = texture2D(u_frame, pixel / vec2(u_width, u_height));
 }

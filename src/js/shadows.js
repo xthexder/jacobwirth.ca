@@ -13,7 +13,7 @@ var reinitRequired = true;
 var mouseLight = false;
 var mousex = 0;
 var mousey = 0;
-var iterations = 1;
+var iterations = 100;
 var spread = 20;
 var maxTexts = 15;
 var targetfps = 50;
@@ -69,7 +69,6 @@ function render() {
   gl.uniform4fv(shaders["raytrace"].uTextUniform, uniformArray);
   gl.uniform1i(shaders["raytrace"].uRectsUniform, rects.length);
   gl.uniform1i(shaders["raytrace"].uTextsUniform, texts.length);
-  gl.uniform1f(shaders["raytrace"].uSeedUniform, Math.random() * gl.viewportWidth * 10);
   gl.uniform1f(shaders["raytrace"].uSpreadUniform, spread);
   gl.uniform1f(shaders["raytrace"].uIterationsUniform, iterations);
 
@@ -205,9 +204,6 @@ function reinitBuffers() {
   if (!gl || !shaders["raytrace"] || !shaders["lookup"]) return;
 
   gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
-
-  gl.useProgram(shaders["raytrace"]);
-  gl.uniform1f(shaders["raytrace"].uSeedUniform, Math.random() * gl.viewportWidth * 10);
 
   gl.useProgram(shaders["final"]);
   gl.uniform1f(shaders["final"].uWidthUniform, gl.viewportWidth);
@@ -452,7 +448,6 @@ function animloop() {
       shaders["raytrace"].uTextUniform = gl.getUniformLocation(shaders["raytrace"], "u_text");
       shaders["raytrace"].uTextOffsetUniform = gl.getUniformLocation(shaders["raytrace"], "u_textoffset");
       shaders["raytrace"].uTextsUniform = gl.getUniformLocation(shaders["raytrace"], "u_texts");
-      shaders["raytrace"].uSeedUniform = gl.getUniformLocation(shaders["raytrace"], "u_seed");
       shaders["raytrace"].uSpreadUniform = gl.getUniformLocation(shaders["raytrace"], "u_spread");
       shaders["raytrace"].uIterationsUniform = gl.getUniformLocation(shaders["raytrace"], "u_iterations");
       shaders["raytrace"].uRenderedTextUniform = gl.getUniformLocation(shaders["raytrace"], "u_renderedtext");

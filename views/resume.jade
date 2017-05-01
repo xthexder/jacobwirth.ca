@@ -29,13 +29,13 @@ html
 
       table
         tr
-          th.left February 2015
+          th.left May 2017
           th
           th.right Contact:
         tr
           td.left Home Address: Ottawa ON, Canada
           td Github: xthexder
-          td.right jacob.wirth@sympatico.ca
+          td.right jacob@wirth.io
         tr
           td.left School Address: Waterloo ON, Canada
           td: a(href='http://code.jacobwirth.ca/') code.jacobwirth.ca
@@ -46,23 +46,17 @@ html
 
       section.first
         :markdown
-          * Programming Languages
-            * Java (6 years)
-              * Thorough knowledge of libraries
-              * Low level bytecode and JVM knowledge
+          * Programming Experience
+            * Proficient in a wide variety of languages,  
+            including C/C++, Java, Golang, and Ruby
+            * Experience in low-level programming
+              * Assembly experience for JVM, ARM, x86
               * Reverse engineering experience
-            * Ruby (2 years)
-              * Experience with testing libraries (TDD)
-              * Chef / Cookbooks experience
-            * Golang (3 years)
-              * Concurrent program design
-              * HTTP / other networking experience
-              * Experience with testing libraries (TDD)
-            * C, C++ (3 years), OpenGL, GLSL (2 years)
-              * Experience with 3D rendering techniques
-            * Bash / Shell scripting (2 years)
-          * Databases
-            * MySQL, Sqlite, PostgreSQL, MongoDB
+            * Concurrent and multi-threaded design
+            * Automated software testing and automation
+            * HTTP and network protocols
+            * Graphics and GPU programming (OpenGL, GLSL)
+            * Bash and shell scripting for unix-based systems
           * Source Control
             * Git, Mercurial, Subversion
             * Travis CI, CircleCI, Jenkins CI
@@ -70,31 +64,38 @@ html
       section
         :markdown
           * Web Experience
-            * Markups and Syntax:
-              * HTML, CSS, Various Templating Languages
-              * JSON, Yaml, Regular Expressions
-            * Client Side:
-              * Javascript, jQuery, AJAX (6 years)
-              * Angular.js, various other libraries (1 year)
-            * Server Side:
-              * Golang (3 years)
-              * Node.js (4 years)
-              * Ruby (2 year)
-              * PHP (4 years)
-            * Web Services: Nginx, Varnish, Apache
+            * Experience with both client and server-side  
+            applications using various libraries
+              * Golang, Node.js, Ruby, PHP
+              * Web Services: Nginx, Varnish, Apache
+          * Databases
+            * MySQL, Sqlite, PostgreSQL, MongoDB
           * Operating Systems
             * Linux: Arch Linux, Debian, Ubuntu, CentOS
             * Mac OS X, Microsoft Windows
           * Hardware Experience
             * Programming embedded systems
             * Circuit design / assembly, board design, soldering
-            * Operating hardware test equipment
+            * Hardware debugging with various equipment
 
     article#work-experience
       h2 Work Experience
 
       :markdown
         ### Developer Intern - Shopify Inc
+        * September 2016 - December 2016 (Data Infrastructure Team)
+          * Created a software license server proxy to allow for better license control
+          * Setup automated cluster deployments using Chef and Cloudera
+          * Continued to maintain Toxiproxy software and documentation
+
+        ### Developer Intern - Stripe Inc
+        * January 2016 - April 2016 (Systems Team)
+          * Worked on implementing an improved webhook queuing system
+
+        ### Developer Intern - Shopify Inc
+        * May 2015 - August 2015 (Developer Tools Team)
+          * Worked with a team to switch CI testing over to Buildkite
+          * Improved CI runtimes by implementing more advanced queuing techniques.
         * September 2014 - December 2014 (Stack / Resiliency Team)
           * Developed [Toxiproxy](https://github.com/Shopify/toxiproxy) for resiliency testing
           * Improved existing "chaos monkey" resiliency testing service
@@ -115,10 +116,8 @@ html
           * Developed a new piece of software for tracking security patrols (On Desktop, Handheld, and Web)
           * Technologies Used: Visual C#, Visual Basic, PostgreSQL, HTML, CSS, ASP.NET, Mercurial
 
-    .page_break
-
     article
-      h2 Relevant Projects
+      h2 Significant Projects
       h3
         | For more details, source code, and other projects see 
         a(href='https://github.com/xthexder') xthexder
@@ -128,12 +127,21 @@ html
       br
 
       :markdown
+        * Stray Photons - Capstone Design Project (2017)
+          * A novel implementation of Global Illumination in 3D rendering
+          * Uses advanced lighting techniques to create unique puzzle mechanics
+          * Awarded 3rd place prize at the UWaterloo Software Engineering Design Symposium
+          * Created from scratch using C++, OpenGL, and GLSL
+        * [Toxiproxy](https://github.com/Shopify/toxiproxy) - Resiliency testing proxy (2015)
+          * Developed at Shopify for programatically simulating network conditions in tests
+          * Has gained a fairly large following on Github
+          * Created using Golang
         * [mods.io](https://mods.io/index) - Minecraft Mod Hosting (2014)
           * File hosting for Minecraft mods that pays authors a revenue share
           * Created using Golang, Revel, Gorp, MySQL, Redis
         * cdn.frustra.org - Custom built, high performance CDN (2014)
           * Serves files for [mods.io](https://mods.io/mods) and [portal2sounds.com](http://www.portal2sounds.com)
-          * Location based routing, low cost, high benchmark figures (4000 req/s per $5 server!)
+          * Location based routing, low cost, high benchmark figures (4000 req/s per $5 server)
           * Created using Varnish, nginx (For SSL proxying), Route53 (DNS), DigitalOcean servers
         * [BBCode Compiler](https://github.com/frustra/bbcode) (2014)
           * A very fast BBCode parser and compiler for rendering html pages
@@ -155,6 +163,8 @@ html
           * Uses java bytecode manipulation to modify minecraft and load mods
           * Created using Java, ASM Library (Previously used BCEL)
 
+    .page_break
+
     article
       h2 Awards and Achievements
 
@@ -164,7 +174,7 @@ html
           * 100%, Grade 12 Programming course - taken in Grade 11. (Sir Robert Borden High School, 2011)
           * Proficiency Award in Computer Science (Sir Robert Borden High School, 2011)
           * Honourable Mention, Canadian Computing Competition (University of Waterloo, Senior, [2011](http://cemc.uwaterloo.ca/contests/computing/2011/stage1/2011CCCStage1Results.pdf) and [2012](http://cemc.uwaterloo.ca/contests/computing/2012/stage1/2012CCCStage1Results.pdf))
-          * Completed [Stripe - Capture the Flag 2.0](https://stripe.com/blog/capture-the-flag-20), #709, 2012)
+          * Completed [Stripe - Capture the Flag 2.0](https://stripe.com/blog/capture-the-flag-20), (#709, 2012)
           * Completed / 1st Place [Stripe - CTF3](https://stripe.com/blog/ctf3-launch) (#1, 2014) [Writeup](https://github.com/xthexder/stripe-ctf-3.0)
           * Top 10 ranking on several Dwite.ca programming contents rounds (2010 - 2012, Team: [Pikachu Bread](http://dwite.ca/home/team/603.html))
 
@@ -174,7 +184,7 @@ html
       :markdown
         * Candidate for Bachelor of Software Engineering - Co-op Program
           * University of Waterloo  
-            September 2012 - Present
+            September 2012 - April 2017
         * Ontario Secondary School Diploma
           * Sir Robert Borden High School  
             September 2008 - June 2012
